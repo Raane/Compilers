@@ -21,16 +21,33 @@ int get_random_number(int n){
 // Return a (dynamically allocated) array of length size,
 // filled with random numbers between 0 and n
 int* create_random_array(int size, int n){
+    int* array = calloc(size, sizeof(int));
+    int i = 0;
+    for(i=0;i<size;i++) {
+        array[i] = get_random_number(n);
+        array[i];
+    }
+    return array;
 }
 
 
 // Should print the contents of array of lenght size
 void print_array(int* array, int size){
+    int i = 0;
+    for(i=0;i<size-1;i++) {
+        printf("%d, ",array[i]);
+    }
+    printf("%d\n",array[size-1]);
 }
 
+// Compare funcrion for the sort
+int compare_integer(const void *a, const void *b) {
+    return ( *(int*)a - *(int*)b );
+}
 
 // Should sort the numbers in array in increasing order
 void sort(int* array, int size){
+    qsort(array, size, sizeof(int), compare_integer);
 }
 
 
@@ -47,6 +64,10 @@ int search(Node* root, int n){
 
 // Returns a dynamically allocated node, with all fields set to NULL/0
 Node* create_blank_node(){
+    struct Node* node = (struct Node*)malloc(sizeof(Node));
+    node->left = NULL;
+    node->right = NULL;
+    node->value = 0;
 }
 
 
@@ -98,6 +119,8 @@ int main(int argc, char** argv){
 
     // Print the second array
     print_array(new_array, 10);
+
+    printf("\nend of runholms code\n");
 
     // Create a tree with the values in the new array
     Node* root = create_tree(new_array, 10);
