@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef enum { false, true } bool;
+
 // A struct for tree nodes, with pointers to the parent and child nodes
 // and a int to store the value at the node.
 typedef struct Node{
@@ -54,6 +56,25 @@ void sort(int* array, int size){
 // Inserts the node into the tree rooted at the node pointed to by root
 void insert_node(Node** root, Node* node){
     //struct Node* current = malloc(sizeof(Node));
+    bool inserted = true;
+    int i = 0;
+    while(!inserted) {
+        int j;
+        for(j=0;j<(int)pow(2.0,i);j++) {
+            struct Node* current_node = *root;
+            int k;
+            for(k=0;k<=i;k++) {
+                if(k==i && current_node==NULL) {
+                    inserted = true;
+                    break;
+                } else {
+                    *current_node = j%2==0 ? current_node->left : current_node->right;
+                }
+            }
+            if(inserted) break;
+        }
+        i++;
+    }
 
 }
 
@@ -78,7 +99,8 @@ Node* create_tree(int* array, int size){
     struct Node* root = malloc(sizeof(Node));
     int i;
     for(i=0;i<size;i++) {
-        struct Node* new_node = malloc(sizeof(Node));
+        struct Node* new_node = create_blank_node();
+        new_node->value = array[i];
         insert_node(&root, new_node);
     }
     return root;
