@@ -53,6 +53,8 @@ void sort(int* array, int size){
 
 // Inserts the node into the tree rooted at the node pointed to by root
 void insert_node(Node** root, Node* node){
+    //struct Node* current = malloc(sizeof(Node));
+
 }
 
 
@@ -73,6 +75,13 @@ Node* create_blank_node(){
 
 // Builds a tree of all the numbers in an array
 Node* create_tree(int* array, int size){
+    struct Node* root = malloc(sizeof(Node));
+    int i;
+    for(i=0;i<size;i++) {
+        struct Node* new_node = malloc(sizeof(Node));
+        insert_node(&root, new_node);
+    }
+    return root;
 }
 
 
