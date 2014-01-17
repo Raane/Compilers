@@ -90,6 +90,13 @@ void insert_node(Node** root, Node* node){
 // Searches for the number n in the tree rooted at root.
 // Should return 1 if the number is present, and 0 if not.
 int search(Node* root, int n){
+    if(root->left != NULL) 
+        if(search(root->left, n))
+            return 1;
+    if(root->right != NULL) 
+        if(search(root->right, n))
+            return 1;
+    return root->value==n;
 }
 
 
@@ -109,7 +116,7 @@ Node* create_tree(int* array, int size){
     for(i=0;i<size;i++) {
         struct Node* new_node = create_blank_node();
         new_node->value = array[i];
-        printf("Inserting node with value %d\n", array[i]);
+        //printf("Inserting node with value %d\n", array[i]);
         insert_node(&root, new_node);
     }
     return root;
@@ -117,7 +124,19 @@ Node* create_tree(int* array, int size){
 
 
 // Prints all the nodes of the tree.
+// Assuming non-NULL root node
 void print_tree(Node* n, int offset){
+    int i;
+    for(i=0;i<offset;i++) {
+        printf(" ");
+    }
+    printf("%d\n", n->value);
+    if(n->left != NULL) {
+        print_tree(n->left, offset+1);
+    }
+    if(n->right != NULL) {
+        print_tree(n->right, offset+1);
+    }
 }
 
 
@@ -136,7 +155,6 @@ double x_cubed(double x){
 // Computes the definite integral of the function using the rectangle method
 double integrate(double (*function)(double), double start, double end, double stepsize){
     int n = (end-start)/stepsize;
-    printf("Number of steps: %d\n",n);
     double sum = 0.0;
     int i;
     for(i=0;i<n;i++) {
@@ -176,6 +194,13 @@ int main(int argc, char** argv){
 
     // Print the tree
     print_tree(root, 0);
+
+    printf("\nstart of runholms test code\n");
+    struct Node* bn = create_blank_node();
+    bn->left = create_blank_node();
+    bn->left->value = 3;
+    print_tree(bn, 0);
+    printf("\nend of runholms code\n");
 
     // Search for the values 3 and 11 in the tree
     // and print the results
