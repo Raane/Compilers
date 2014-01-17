@@ -59,10 +59,10 @@ void insert_node(Node** root, Node* node){
     //struct Node* current = malloc(sizeof(Node));
     bool inserted = false;
     int i = 0;
+    /*
     while(!inserted) {
         printf("Searching in level %d\n", i);
         int j;
-        printf("pow = %d\n",(int)pow(2.0,(double)i));
         for(j=0;j<(int)pow(2.0,(double)i);j++) {
             printf("hit1");
             struct Node* current_node = *root;
@@ -70,7 +70,10 @@ void insert_node(Node** root, Node* node){
             int k;
             for(k=0;k<=i;k++) {
                 printf("Check if k:%d==i:%d",k,i);
-                if(k==i && current_node==NULL) {
+                
+
+                
+                if(k==i && *current_node==NULL) {
                     inserted = true;
                     break;
                 } else {
@@ -80,7 +83,7 @@ void insert_node(Node** root, Node* node){
             if(inserted) break;
         }
         i++;
-    }
+    }*/
 }
 
 
@@ -132,6 +135,15 @@ double x_cubed(double x){
 
 // Computes the definite integral of the function using the rectangle method
 double integrate(double (*function)(double), double start, double end, double stepsize){
+    int n = (end-start)/stepsize;
+    printf("Number of steps: %d\n",n);
+    double sum = 0.0;
+    int i;
+    for(i=0;i<n;i++) {
+        double x = start + i*stepsize;
+        sum += (*function)(x); 
+    }
+    return sum*stepsize;
 }
 
 
