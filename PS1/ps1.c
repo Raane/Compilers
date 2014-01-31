@@ -56,34 +56,27 @@ void sort(int* array, int size){
 
 // Inserts the node into the tree rooted at the node pointed to by root
 void insert_node(Node** root, Node* node){
-    //struct Node* current = malloc(sizeof(Node));
-    bool inserted = false;
-    int i = 0;
-    /*
-    while(!inserted) {
-        printf("Searching in level %d\n", i);
-        int j;
-        for(j=0;j<(int)pow(2.0,(double)i);j++) {
-            printf("hit1");
-            struct Node* current_node = *root;
-            printf("hit2");
-            int k;
-            for(k=0;k<=i;k++) {
-                printf("Check if k:%d==i:%d",k,i);
-                
+    int depth = 0;
+    while(true) {
+        //if(insert_node_at_depth(*root, *node, depth))
+            break;
+        depth++;
+    }
+}
 
-                
-                if(k==i && *current_node==NULL) {
-                    inserted = true;
-                    break;
-                } else {
-                    *current_node = j%2==0 ? *(current_node->left) : *(current_node->right);
-                }
-            }
-            if(inserted) break;
+bool insert_node_at_depth(Node* root, Node* node, int max_depth) {
+    if(max_depth==0) {
+        if(root==NULL) {
+            *root = *node;
+            return true;
         }
-        i++;
-    }*/
+    } else {
+        if(insert_node_at_depth((root->left), node, max_depth-1))
+            return true;
+        if(insert_node_at_depth((root->right), node, max_depth-1)) 
+            return true;
+        return false;
+    }
 }
 
 
@@ -187,20 +180,11 @@ int main(int argc, char** argv){
     // Print the second array
     print_array(new_array, 10);
 
-    printf("\nend of runholms code\n");
-
     // Create a tree with the values in the new array
     Node* root = create_tree(new_array, 10);
 
     // Print the tree
     print_tree(root, 0);
-
-    printf("\nstart of runholms test code\n");
-    struct Node* bn = create_blank_node();
-    bn->left = create_blank_node();
-    bn->left->value = 3;
-    print_tree(bn, 0);
-    printf("\nend of runholms code\n");
 
     // Search for the values 3 and 11 in the tree
     // and print the results
