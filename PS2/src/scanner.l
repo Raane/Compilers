@@ -55,4 +55,5 @@ VAR             { RETURN(VAR); }
 {DIGIT}+        { yylval = atoi(yytext); RETURN(NUMBER); }
 "\""[^\n]*"\""  { yylval = (intptr_t) yytext; RETURN(STRING); }
 {LETTER}({LETTER}|{DIGIT})* { yylval = (intptr_t) yytext; RETURN(IDENTIFIER); }
+.               { RETURN( yytext[0] ); }
 %%
