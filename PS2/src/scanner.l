@@ -15,7 +15,6 @@
 %option noyywrap
 %option yylineno
 
-
 DIGIT [0-9]
 WHITESPACE [\ \n\t]
 LETTER [a-zA-Z]
