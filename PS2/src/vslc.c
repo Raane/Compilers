@@ -1,20 +1,30 @@
 #include "vslc.h"
 
 static char *outfile = NULL;
+int outputStage = -1;
+int peephole;
 
 static void
 options ( int argc, char **argv )
 {
-    int32_t opt = 0;
+    int opt = 0;
     while ( opt != -1 )
     {
-        opt = getopt ( argc, argv, "f:o:" );
+        opt = getopt ( argc, argv, "f:o:s:p" );
         switch ( opt )
         {
             case -1:    /* No more options */
                 break;
 
-            case 'f':   /* Redirect input stream from file */
+            case 'p':
+                peephole = 1;
+                break;
+                
+            case 's': /* Select what to print */
+                outputStage = (int) strtol( optarg, NULL, 0);
+                break;
+
+            case 'f':   /* Redirect input stream from file */{
                 if ( freopen ( optarg, "r", stdin ) == NULL )
                 {
                     fprintf (
@@ -22,15 +32,17 @@ options ( int argc, char **argv )
                     );
                     exit ( EXIT_FAILURE );
                 }
+                                                             }
                 break;
 
-            case 'o':   /* Save filename, redirect stdout when src is ok */
-                outfile = STRDUP ( optarg );
+            case 'o':   /* Save filename, redirect stdout when src is ok */{
+                outfile = ( STRDUP ( optarg ));
+                                                                           }
                 break;
 
             default:    /* Got some option we don't recognize */
                 fprintf ( stderr,
-                    "Usage: %s [-p] [-v #] [-f infile] [-o] outfile\n", argv[0]
+                    "Usage: %s [-p] [-v #] [-f infile] [-o] outfile [-t num]\n", argv[0]
                 );
                 exit ( EXIT_FAILURE );
         }
@@ -42,26 +54,33 @@ options ( int argc, char **argv )
 int
 main ( int argc, char **argv )
 {
+	outputStage = 12;
+
     options ( argc, argv );
 
-    yyparse();
-
-#ifdef DUMP_TREES
-    if ( (DUMP_TREES & 1) != 0 )
-        node_print ( stderr, root, 0 );
-#endif
-
-    /* Parsing and semantics are ok, redirect stdout to file (if requested) */
-    if ( outfile != NULL )
-    {
-        if ( freopen ( outfile, "w", stdout ) == NULL )
-        {
-            fprintf ( stderr, "Could not open output file '%s'\n", outfile );
-            exit ( EXIT_FAILURE );
-        }
-        free ( outfile );
+    /* In order to only scan the tokens we call yylex() directly */
+    if ( outputStage == 1 ) {
+    	do { } while ( yylex() ); // "Token files"
+        exit(0);
     }
+    
+    /* The parser calls yylex(), match the rules and builds the abstract syntax tree */
+    // "BuildTree files"
+    yyparse();
+    if ( outputStage == 2 ) { 
+        exit(0); // Exit if we are only printing this stages debug information. "BuildTree files"
+    }
+    
+    /* Print the abstract syntax tree */
+    if ( outputStage == 3 ) {
+        node_print ( stderr, root, 0 ); // "Tree files"
+        exit(0);
+    }
+	
+    destroy_subtree ( stderr, root );
+    
+    
+    yylex_destroy(); // Free internal data structures of the scanner.
 
-    destroy_subtree ( root );
     exit ( EXIT_SUCCESS );
 }

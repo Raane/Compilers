@@ -15,18 +15,16 @@ INCLUDEPATH=\
     -Iinclude\
     -I/usr/local/include\
 
-CFLAGS+=  -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH} -DDUMP_TOKENS -DDUMP_TREES
-LDFLAGS+= -L/usr/local/lib -L/opt/libghthash/0.6.2/lib
+CFLAGS+=  -g -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH}
+LDFLAGS+= -L/usr/local/lib -Llib
 YFLAGS+=  --defines=work/parser.h -o y.tab.c
 
 # Targets:
 
 # Do everything by default, if it isn't done already
 all: bin/vslc
-test: all 
+test: all
 	./test_runner.sh
-vsl_programs/%: all vsl_programs/%.vsl
-	${MAKE} -C vsl_programs $*
 
 #
 # The binary is built in 'obj' when all the object code is ready.
@@ -39,8 +37,7 @@ bin/vslc: obj/vslc $(filter-out $(wildcard bin), bin)
 #
 # The compiler executable depends on everything having turned into object code
 #
-obj/vslc: work/scanner.o work/parser.o obj/vslc.o\
-	obj/nodetypes.o obj/tree.o
+obj/vslc: work/scanner.o work/parser.o obj/vslc.o obj/nodetypes.o obj/tree.o
 
 #
 # For all the handwritten C files, there is a C file in 'src' and a matching
@@ -73,12 +70,10 @@ work/parser.h: work/parser.c
 #
 clean:
 	if [ -e work ]; then rm -r work; fi
-	if [ -e testOutput ]; then rm -r testOutput; fi
 	if [ -e obj ]; then rm -r obj; fi
-	${MAKE} -C vsl_programs clean
+	if [ -e testOutput ]; then rm -r testOutput; fi
 purge: clean
 	if [ -e bin ]; then rm -r bin; fi
-	${MAKE} -C vsl_programs purge
 
 #
 # Targets to create directories (when they don't exist already).

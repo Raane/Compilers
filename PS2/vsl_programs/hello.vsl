@@ -1,5 +1,4 @@
-FUNC hello ()
-{
-    PRINT "Hello, world!"
-    RETURN 0
-}
+VOID FUNC hello ()
+START
+    PRINT "Hello, world!";
+END

@@ -1,20 +1,21 @@
-FUNC fibonacci_iterative( n )
-{
-    VAR x, y, f, i
-    x := 1
-    y := 1
-    f := 1
-    
+INT FUNC fibonacci_iterative( INT n )
+START
+    INT x; INT y; INT f;
+    x := 1;
+    y := 1;
+    f := 1;
+ 
     IF n >= 2 THEN
-    	FOR i := 2 TO n DO
-    	{
-    		f := x + y
-    		x := y
-    		y := f
-    	}
-    	DONE
-    FI
+        INT i;
+        i := 2;
+    	WHILE (i < n) DO
+    		f := x + y;
+    		x := y;
+    		y := f;
+    		i := i + 1;
+    	END
+    END
 
-    PRINT "Fibonacci number #",n,"is",f
-    RETURN 0
-}
+    PRINT "Fibonacci number #",n,"is ",f;
+    RETURN 0;
+END
