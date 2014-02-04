@@ -137,42 +137,39 @@ int yylex ( void );                 /* Defined in the generated scanner */
 %%
 program             : function_list                                     { root = CN( program_n, 1, $1 ); }
                     | class_list function_list                          { root = CN( program_n, 2, $1, $2 ); };
-function            : TYPE FUNC VARIABLE '(' parameter_list ')' START statement_list END    { $$ = CN( function_n, NULL, 3, $2, $4, $6 ); };    //TODO
-function_list       : function_list function                            { $$ = CN( function_list_n, NULL, 2, $1, $2 ); }
+function            : type FUNC variable '(' parameter_list ')' START statement_list END    { $$ = CN( function_n, 3, $2, $4, $6 ); };    //TODO
+function_list       : function_list function                            { $$ = CN( function_list_n, 2, $1, $2 ); }
                     | ;                                                                                                                         //TODO
-statement_list      : STATEMENT                                         { $$ = CN( statement_list_n, NULL, 1, $1 ); }
-                    | statement_list STATEMENT                          { $$ = CN( statement_list_n, NULL, 2, $1, $2 ); };
-variable_list       : declaration_statement                                                                                                     //TODO
+statement_list      : statement                                         { $$ = CN( statement_list_n, 1, $1 ); }
+                    | statement_list statement                          { $$ = CN( statement_list_n, 2, $1, $2 ); };
+variable_list       : declaration_statement                             { root = CN( program_n, , ); }                                                                        //TODO
                     | variable_list ',' declaration_statement                                                                                   //TODO
-                    /*VARIABLE                                          { $$ = CN( variable_list_n, NULL, 1, $1 ); }
-                    | INDEXED_VARIABLE                                  { $$ = CN( variable_list_n, NULL, 1, $1 ); }
-                    | variable_list ',' VARIABLE                        { $$ = CN( variable_list_n, NULL, 2, $1, $3 ); }
-                    | variable_list ',' INDEXED_VARIABLE                { $$ = CN( variable_list_n, NULL, 2, $1, $3 ); };*/
-expression_list     : expression                                        { $$ = CN( expression_list_n, NULL, 1, $1 ); }
-                    | expression_list ',' expression                    { $$ = CN( expression_list_n, NULL, 2, $1, $3 ); };
+                    | variable_list ',' INDEXED_variable                { $$ = CN( variable_list_n, 2, $1, $3 ); };*/
+expression_list     : expression                                        { $$ = CN( expression_list_n, 1, $1 ); }
+                    | expression_list ',' expression                    { $$ = CN( expression_list_n, 2, $1, $3 ); };
 parameter_list      : variable_list                                     { node_init ( $$ = malloc(sizeof(node_t)), parameter_list_n, NULL, 1, $1 ); }               //TODO
                     |                                                   { node_init ( $$ = NULL, parameter_list_n, NULL, 0 ); };
 argument_list       : expression_list                                   { node_init ( $$ = malloc(sizeof(node_t)), argument_list_n, NULL, 1, $1 ); }
                     |                                                   { $$ = NULL; };
 class_list          : class                                                                                                                     //TODO
                     | class_list class                                                                                                          //TODO
-class               : class VARIABLE HAS declaration_list WITH function_list END                                                                //TODO
-declaration_list    : declaration_list declaration_statement ','        { node_init ( $$ = malloc(sizeof(node_t)), declaration_list_n, NULL, 2, $1/*, $2*/ ); }
+class               : _CLASS_ variable HAS declaration_list WITH function_list END                                                                //TODO
+declaration_list    : declaration_list declaration_statement ','        { node_init ( $$ = malloc(sizeof(node_t)), declaration_list_n, 2, $1/*, $2*/ ); }
                     |                                                   { node_init ( $$ = NULL, declaration_list_n, NULL, 0 ); };
-STATEMENT           : declaration_statement ','                         { $$ = CN( statement_n, NULL, 1, $1 ); }*/
-                    | assignment_statement ','                          { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | if_statement ','                                  { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | while_statement ','                               { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | print_statement ','                               { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | return_statement ','                              { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | CALL ';'                                          { $$ = CN( statement_n, NULL, 1, $1 ); };
-declaration_statement : TYPE VARIABLE                                                                                                           //TODO
-assignment_statement: VARIABLE ASSIGN expression                        { $$ = CN( assignment_statement_n, NULL, 2, $1, $3 ); };                //TODO?
-if_statement        : IF expression THEN statement_list ELSE STATEMENT END   { $$ = CN( if_statement_n, NULL, 3, $2, $4, $6 ); }                //TODO?
-                    | IF expression THEN statement_list END                  { $$ = CN( if_statement_n, NULL, 2, $2, $4 ); };                   //TODO?
-while_statement     : WHILE expression DO STATEMENTi_LIST END                 { $$ = CN( while_statement_n, NULL, 2, $2, $4 ); };
+statement           : declaration_statement ','                         { $$ = CN( statement_n, 1, $1 ); }*/
+                    | assignment_statement ','                          { $$ = CN( statement_n, 1, $1 ); }
+                    | if_statement ','                                  { $$ = CN( statement_n, 1, $1 ); }
+                    | while_statement ','                               { $$ = CN( statement_n, 1, $1 ); }
+                    | print_statement ','                               { $$ = CN( statement_n, 1, $1 ); }
+                    | return_statement ','                              { $$ = CN( statement_n, 1, $1 ); }
+                    | call ';'                                          { $$ = CN( statement_n, 1, $1 ); };
+declaration_statement : type variable                                                                                                           //TODO
+assignment_statement: variable ASSIGN expression                        { $$ = CN( assignment_statement_n, 2, $1, $3 ); };                //TODO?
+if_statement        : IF expression THEN statement_list ELSE statement END   { $$ = CN( if_statement_n, 3, $2, $4, $6 ); }                //TODO?
+                    | IF expression THEN statement_list END                  { $$ = CN( if_statement_n, 2, $2, $4 ); };                   //TODO?
+while_statement     : WHILE expression DO STATEMENTi_LIST END                 { $$ = CN( while_statement_n, 2, $2, $4 ); };
 return_statement    : RETURN expression
-print_statement     : PRINT expression_list                             { $$ = CN( print_statement_n, NULL, 1, $2 ); };
+print_statement     : PRINT expression_list                             { $$ = CN( print_statement_n, 1, $2 ); };
 expression          : constant                                                                                                                  //TODO
                     | expression '+' expression                         { $$ = CN( expression_n, STRDUP("+"), 2, $1, $3 ); }
                     | expression '-' expression                         { $$ = CN( expression_n, STRDUP("-"), 2, $1, $3 ); }
@@ -193,12 +190,8 @@ expression          : constant                                                  
                     | THIS
                     | lvalue
                     | NEW type  ;
-                    /*| INTEGER                                         { $$ = CN( expression_n, NULL, 1, $1 ); }
-                    | VARIABLE                                          { $$ = CN( expression_n, NULL, 1, $1 ); }
-                    | VARIABLE '(' argument_list ')'                    { $$ = CN( expression_n, STRDUP("F"), 2, $1, $3 ); }
-                    | VARIABLE '[' expression ']'                       { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };*/
-call                : VARIABLE '(' argument_list ')'                    { $$ = CN( expression_n, STRDUP("F"), 2, $1, $3 ); }                    //TODO
-                    | expression '.' VARIABLE '(' argument_list ')'     { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };*/                 //TODO
+call                : variable '(' argument_list ')'                    { $$ = CN( expression_n, STRDUP("F"), 2, $1, $3 ); }                    //TODO
+                    | expression '.' variable '(' argument_list ')'     { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };*/                 //TODO
 lvalue              : variable                                                                                                                  //TODO
                     | expression '.' variable                                                                                                   //TODO
 constant            : TRUE_CONST                                                                                                                //TODO
