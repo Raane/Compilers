@@ -151,45 +151,81 @@ VARIABLE_LIST       : DECLARATION_STATEMENT                                     
                     | VARIABLE_LIST ',' INDEXED_VARIABLE                { $$ = CN( variable_list_n, NULL, 2, $1, $3 ); };*/
 EXPRESSION_LIST     : EXPRESSION                                        { $$ = CN( expression_list_n, NULL, 1, $1 ); }
                     | EXPRESSION_LIST ',' EXPRESSION                    { $$ = CN( expression_list_n, NULL, 2, $1, $3 ); };
-PARAMETER_LIST      : VARIABLE_LIST                                     { node_init ( $$ = malloc(sizeof(node_t)), parameter_list_n, NULL, 1, $1 ); }
+PARAMETER_LIST      : VARIABLE_LIST                                     { node_init ( $$ = malloc(sizeof(node_t)), parameter_list_n, NULL, 1, $1 ); }               //TODO
                     |                                                   { node_init ( $$ = NULL, parameter_list_n, NULL, 0 ); };
-PRINT_LIST          : PRINT_ITEM                                        { $$ = CN( print_list_n, NULL, 1, $1 ); }
-                    | PRINT_LIST ',' PRINT_ITEM                         { $$ = CN( print_list_n, NULL, 2, $1, $3 ); };
-DECLARATION_LIST    : DECLARATION_LIST /*DECLARATION*/                  { node_init ( $$ = malloc(sizeof(node_t)), declaration_list_n, NULL, 2, $1/*, $2*/ ); }
-                    |                                                   { node_init ( $$ = NULL, declaration_list_n, NULL, 0 ); };
 ARGUMENT_LIST       : EXPRESSION_LIST                                   { node_init ( $$ = malloc(sizeof(node_t)), argument_list_n, NULL, 1, $1 ); }
                     |                                                   { node_init ( $$ = NULL, argument_list_n, NULL, 0 ); };
-STATEMENT           :/* DECLARATION_STATEMENT                           { $$ = CN( statement_n, NULL, 1, $1 ); }*/
-                    | ASSIGNMENT_STATEMENT                              { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | RETURN_STATEMENT                                  { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | PRINT_STATEMENT                                   { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | IF_STATEMENT                                      { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | WHILE_STATEMENT                                   { $$ = CN( statement_n, NULL, 1, $1 ); }
-                    | BLOCK                                             { $$ = CN( statement_n, NULL, 1, $1 ); };
-BLOCK               : '{' DECLARATION_LIST STATEMENT_LIST '}'           { $$ = CN( block_n, NULL, 2, $2, $3 ); };
-ASSIGNMENT_STATEMENT: VARIABLE ASSIGN EXPRESSION                        { $$ = CN( assignment_statement_n, NULL, 2, $1, $3 ); }
-                    | VARIABLE '[' EXPRESSION ']' ASSIGN EXPRESSION     { $$ = CN( assignment_statement_n, NULL, 3, $1, $3, $6 ); };
-RETURN_STATEMENT    : RETURN EXPRESSION                                 { $$ = CN( return_statement_n, NULL, 1, $2 ); };
-PRINT_STATEMENT     : PRINT PRINT_LIST                                  { $$ = CN( print_statement_n, NULL, 1, $2 ); };
-IF_STATEMENT        : IF EXPRESSION THEN STATEMENT END                  { $$ = CN( if_statement_n, NULL, 2, $2, $4 ); }
-                    | IF EXPRESSION THEN STATEMENT ELSE STATEMENT END   { $$ = CN( if_statement_n, NULL, 3, $2, $4, $6 ); };
-WHILE_STATEMENT     : WHILE EXPRESSION DO STATEMENT END                 { $$ = CN( while_statement_n, NULL, 2, $2, $4 ); };
-EXPRESSION          : EXPRESSION '+' EXPRESSION                         { $$ = CN( expression_n, STRDUP("+"), 2, $1, $3 ); }
+CLASS_LIST          : CLASS                                                                                                                     //TODO
+                    | CLASS_LIST CLASS                                                                                                          //TODO
+CLASS               : CLASS VARIABLE HAS DECLARATION_LIST WITH FUNCTION_LIST END                                                                //TODO
+DECLARATION_LIST    : DECLARATION_LIST DECLARATION_STATEMENT ','        { node_init ( $$ = malloc(sizeof(node_t)), declaration_list_n, NULL, 2, $1/*, $2*/ ); }
+                    |                                                   { node_init ( $$ = NULL, declaration_list_n, NULL, 0 ); };
+STATEMENT           : DECLARATION_STATEMENT ','                         { $$ = CN( statement_n, NULL, 1, $1 ); }*/
+                    | ASSIGNMENT_STATEMENT ','                          { $$ = CN( statement_n, NULL, 1, $1 ); }
+                    | IF_STATEMENT ','                                  { $$ = CN( statement_n, NULL, 1, $1 ); }
+                    | WHILE_STATEMENT ','                               { $$ = CN( statement_n, NULL, 1, $1 ); }
+                    | PRINT_STATEMENT ','                               { $$ = CN( statement_n, NULL, 1, $1 ); }
+                    | RETURN_STATEMENT ','                              { $$ = CN( statement_n, NULL, 1, $1 ); }
+                    | CALL ';'                                          { $$ = CN( statement_n, NULL, 1, $1 ); };
+DECLARATION_STATEMENT : TYPE VARIABLE                                                                                                           //TODO
+ASSIGNMENT_STATEMENT: VARIABLE ASSIGN EXPRESSION                        { $$ = CN( assignment_statement_n, NULL, 2, $1, $3 ); };                //TODO?
+IF_STATEMENT        : IF EXPRESSION THEN STATEMENT_LIST ELSE STATEMENT END   { $$ = CN( if_statement_n, NULL, 3, $2, $4, $6 ); }                //TODO?
+                    | IF EXPRESSION THEN STATEMENT_LIST END                  { $$ = CN( if_statement_n, NULL, 2, $2, $4 ); };                   //TODO?
+WHILE_STATEMENT     : WHILE EXPRESSION DO STATEMENTi_LIST END                 { $$ = CN( while_statement_n, NULL, 2, $2, $4 ); };
+RETURN_STATEMENT    : RETURN expression
+PRINT_STATEMENT     : PRINT expression_list                             { $$ = CN( print_statement_n, NULL, 1, $2 ); };
+EXPRESSION          : CONSTANT                                                                                                                  //TODO
+                    | EXPRESSION '+' EXPRESSION                         { $$ = CN( expression_n, STRDUP("+"), 2, $1, $3 ); }
                     | EXPRESSION '-' EXPRESSION                         { $$ = CN( expression_n, STRDUP("-"), 2, $1, $3 ); }
                     | EXPRESSION '*' EXPRESSION                         { $$ = CN( expression_n, STRDUP("*"), 2, $1, $3 ); }
                     | EXPRESSION '/' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
-                    | '-' EXPRESSION %prec UMINUS                       { $$ = CN( expression_n, STRDUP("-"), 1, $2 ); }
-                    | EXPRESSION '^' EXPRESSION                         { $$ = CN( expression_n, STRDUP("^"), 2, $1, $3 ); }
+                    | EXPRESSION '>' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '<' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '==' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '!=' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '>=' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '<=' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '&&' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | EXPRESSION '||' EXPRESSION                         { $$ = CN( expression_n, STRDUP("/"), 2, $1, $3 ); }
+                    | '-' EXPRESSION                                    { $$ = CN( expression_n, STRDUP("-"), 1, $2 ); }                                     //TODO?
+                    | '!' EXPRESSION                                    { $$ = CN( expression_n, STRDUP("-"), 1, $2 ); }                                     //TODO?
                     | '(' EXPRESSION ')'                                { $$ = CN( expression_n, NULL, 1, $2 ); }
-                    /*| INTEGER                                         { $$ = CN( expression_n, NULL, 1, $1 ); }*/
+                    | call
+                    | THIS
+                    | lvalue
+                    | NEW type  ;
+                    /*| INTEGER                                         { $$ = CN( expression_n, NULL, 1, $1 ); }
                     | VARIABLE                                          { $$ = CN( expression_n, NULL, 1, $1 ); }
                     | VARIABLE '(' ARGUMENT_LIST ')'                    { $$ = CN( expression_n, STRDUP("F"), 2, $1, $3 ); }
-                    | VARIABLE '[' EXPRESSION ']'                       { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };
-/*DECLARATION         : VAR VARIABLE_LIST                               { $$ = CN( declaration_n, NULL, 1, $2 ); };*/
+                    | VARIABLE '[' EXPRESSION ']'                       { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };*/
+CALL                : VARIABLE '(' ARGUMENT_LIST ')'                    { $$ = CN( expression_n, STRDUP("F"), 2, $1, $3 ); }                    //TODO
+                    | expression '.' VARIABLE '(' argument_list ')'     { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };*/                 //TODO
+lvalue              : variable                                                                                                                  //TODO
+                    | expression '.' variable                                                                                                   //TODO
+constant            : TRUE_CONST                                                                                                                //TODO
+                    | FALSE_CONST                                                                                                               //TODO
+                    | INT_CONST                                                                                                                 //TODO
+                    | FLOAT_CONST                                                                                                               //TODO
+                    | STRING_CONST                                                                                                              //TODO
+type                : INT
+                    | FLOAT
+                    | BOOL
+                    | VOID
+                    | variable
+variable            : IDENTIFIER
+
+
+/*PRINT_LIST          : PRINT_ITEM                                        { $$ = CN( print_list_n, NULL, 1, $1 ); }
+                    | PRINT_LIST ',' PRINT_ITEM                         { $$ = CN( print_list_n, NULL, 2, $1, $3 ); };
+DECLARATION_LIST    : DECLARATION_LIST /*DECLARATION*/                  { node_init ( $$ = malloc(sizeof(node_t)), declaration_list_n, NULL, 2, $1, $2 ); }
+                    |                                                   { node_init ( $$ = NULL, declaration_list_n, NULL, 0 ); };
+BLOCK               : '{' DECLARATION_LIST STATEMENT_LIST '}'           { $$ = CN( block_n, NULL, 2, $2, $3 ); };
+RETURN_STATEMENT    : RETURN EXPRESSION                                 { $$ = CN( return_statement_n, NULL, 1, $2 ); };
+DECLARATION         : VAR VARIABLE_LIST                               { $$ = CN( declaration_n, NULL, 1, $2 ); };
 VARIABLE            : IDENTIFIER                                        { $$ = CN( variable_n, STRDUP((char *) $1), 0 ); };
-INDEXED_VARIABLE    : VARIABLE /*'[' INTEGER ']'*/                      { $$ = CN( variable_n, NULL, 2, $1, /*$3*/ ); };
+INDEXED_VARIABLE    : VARIABLE /*'[' INTEGER ']'*/                      { $$ = CN( variable_n, NULL, 2, $1, $3 ); };
 PRINT_ITEM          : EXPRESSION                                        { $$ = CN( print_item_n, NULL, 1, $1 ); }
-;/*                    | TEXT                                           { $$ = CN( print_item_n, NULL, 1, $1 ); };*/
+;/*                    | TEXT                                           { $$ = CN( print_item_n, NULL, 1, $1 ); };
 
 %% 
 
