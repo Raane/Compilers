@@ -35,20 +35,10 @@ FOR             { RETURN(FOR); }
 TO              { RETURN(TO); }
 VAR             { RETURN(VAR); }
 ":="            { RETURN(ASSIGN); }
-"+"             { RETURN('+'); }
-"-"             { RETURN('-'); }
-"*"             { RETURN('*'); }
-"/"             { RETURN('/'); }
-">"             { RETURN('>'); }
-"<"             { RETURN('<'); }
 "<="            { RETURN(GEQUAL); }
 ">="            { RETURN(LEQUAL); }
 "=="            { RETURN(EQUAL); }
 "!="            { RETURN(NEQUAL); }
-"("              {RETURN('('); }
-")"              {RETURN(')'); }
-"{"              {RETURN('{'); }
-"}"              {RETURN('}'); }
 "//"[^\n]*      { }
 {WHITESPACE}+   { }
 {DIGIT}+        { yylval = atoi(yytext); RETURN(NUMBER); }
