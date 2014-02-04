@@ -1,5 +1,0 @@
-VOID FUNC printing ()
-START
-    PRINT "True is ", TRUE;
-END
-

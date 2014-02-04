@@ -1,4 +1,0 @@
-FLOAT FUNC nop42V2 (FLOAT variable)
-START
-	RETURN variable;
-END

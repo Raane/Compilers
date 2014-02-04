@@ -1,5 +1,0 @@
-VOID FUNC adding ()
-START
-	BOOL a;
-	a := TRUE + 42;
-END

@@ -1,9 +1,0 @@
-VOID FUNC one ()
-START
-    PRINT "42 is ", two();
-END
-
-INT FUNC two ()
-START
-    RETURN 42;
-END

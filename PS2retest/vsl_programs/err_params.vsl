@@ -1,4 +1,0 @@
-INT FUNC params (INT a)
-START
-	PRINT a;
-END  // This will fail

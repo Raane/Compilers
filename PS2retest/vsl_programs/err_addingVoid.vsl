@@ -1,5 +1,0 @@
-VOID FUNC adding ()
-START
-	VOID a; // This will fail!
-	a := 1.0 + 2;
-END

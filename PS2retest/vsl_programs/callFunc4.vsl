@@ -1,9 +1,0 @@
-VOID FUNC one ()
-START
-    PRINT "return is ", two();
-END
-
-BOOL FUNC two ()
-START
-    RETURN TRUE;
-END
