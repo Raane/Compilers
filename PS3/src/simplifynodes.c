@@ -79,7 +79,7 @@ Node_t *simplify_list_with_null ( Node_t *root, int depth )
     free(root->children);
     root->children = malloc(sizeof(Node_t));
     root->children[0] = nonNullChild;
-
+    root->n_children = root->n_children-1;
 }
 
 
