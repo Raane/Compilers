@@ -11,20 +11,28 @@ static int strings_size = 16, strings_index = -1;
 
 void symtab_init ( void )
 {
-    
+    strings_size=0;
+    strings_index=0;
+    strings = malloc(0);
 }
 
 
 void symtab_finalize ( void )
 {
-    
+    free(strings);
 }
 
 
 int strings_add ( char *str )
 {
-
-
+    char **newStrings = malloc(strings_index * sizeof(**newStrings));
+    int i;
+    for(i=0;i<strings_size+1;i++) {
+        newStrings[i] = strings[i];
+    }
+    newStrings[strings_size] = str;
+    free(strings);
+    strings = newStrings;
     if(outputStage == 7)
         fprintf ( stderr, "Add strings (%s), index: %d \n", str, strings_index );
 
