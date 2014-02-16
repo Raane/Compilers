@@ -97,7 +97,9 @@ Node_t *simplify_expression ( Node_t *root, int depth )
     if(outputStage == 4)
         fprintf ( stderr, "%*cSimplify %s (%s) \n", depth, ' ', root->nodetype.text, root->expression_type.text );
     simplify_children(root, depth);
-    *root = *(root->children[0]);
+    if(root->expression_type.index==DEFAULT_E || root->expression_type.index==CONSTANT_E) {
+        *root = *(root->children[0]);
+    }
 
 }
 
