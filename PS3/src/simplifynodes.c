@@ -1,6 +1,7 @@
 #include "simplifynodes.h"
 
 extern int outputStage; // This variable is located in vslc.c
+void simplify_children( Node_t *root, int depth );
 
 Node_t* simplify_default ( Node_t *root, int depth )
 {

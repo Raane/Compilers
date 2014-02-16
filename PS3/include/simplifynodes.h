@@ -13,5 +13,4 @@ Node_t *simplify_list_with_null ( Node_t *root, int depth ); // Extension 1
 Node_t *simplify_list ( Node_t *root, int depth );
 Node_t *simplify_expression ( Node_t *root, int depth );
 Node_t *simplify_class( Node_t *root, int depth );
-void simplify_children( Node_t *root, int depth );
 
