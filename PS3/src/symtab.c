@@ -13,28 +13,31 @@ void symtab_init ( void )
 {
     strings_size=0;
     strings_index=0;
-    strings = malloc(0);
+    strings = malloc(10000);
 }
 
 
 void symtab_finalize ( void )
 {
-    free(strings);
+    //free(strings);
 }
 
 
 int strings_add ( char *str )
 {
-    char **newStrings = malloc(strings_index * sizeof(**newStrings));
-    int i;
-    for(i=0;i<strings_size+1;i++) {
-        newStrings[i] = strings[i];
-    }
-    newStrings[strings_size] = str;
-    free(strings);
-    strings = newStrings;
+    //char **newStrings = malloc(strings_index * sizeof(**newStrings));
+    //int i;
+    //for(i=0;i<strings_size+1;i++) {
+    //    newStrings[i] = strings[i];
+    //}
+    //newStrings[strings_size] = str;
+    //free(strings);
+    //strings = newStrings;
+    strings[strings_index] = str;
     if(outputStage == 7)
         fprintf ( stderr, "Add strings (%s), index: %d \n", str, strings_index );
+    strings_index++;
+    strings_size++;
 
     
 }

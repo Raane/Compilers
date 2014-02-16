@@ -21,8 +21,11 @@ int bind_constant ( node_t *root, int stackOffset)
             root->children[i]->bind_names(root->children[i], stackOffset+1);
         }
     }
-    fprintf ( stderr, "CONSTANT\n" );
-    strings_add(root->label);
+    if(outputStage == 6)
+        fprintf ( stderr, "CONSTANT\n" );
+    if(root->data_type.base_type == STRING_TYPE) {
+        strings_add(root->string_const);
+    }
     return 0;
 }
 
