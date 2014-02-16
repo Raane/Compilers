@@ -1,9 +1,4 @@
-1,194c1
-< Hit rule "TYPE" on text 'INT' at line 4
-< Hit rule "VARIABLE" on text 'funcall' at line 4
-< Hit rule "TYPE" on text 'INT' at line 6
-< Hit rule "VARIABLE" on text 'x' at line 6
-< Hit rule "DECLARATION_STATEMENT" on text 'x' at line 6
+6,194c6
 < Hit rule "STATEMENT" on text ';' at line 6
 < Hit rule "STATEMENT_LIST" on text ';' at line 6
 < Hit rule "TYPE" on text 'INT' at line 6
@@ -194,4 +189,4 @@
 < Hit rule "FUNCTION_LIST" on text 'END' at line 32
 < Hit rule "PROGRAM" on text '' at line 33
 ---
-> 	Error: syntax error detected at line 1 with yytext: /
+> 	Error: syntax error detected at line 6 with yytext: ;

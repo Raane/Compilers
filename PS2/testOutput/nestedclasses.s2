@@ -1,1 +1,5 @@
-	Error: syntax error detected at line 1 with yytext: C
+Hit rule "VARIABLE" on text 'Inner' at line 1
+Hit rule "TYPE" on text 'INT' at line 2
+Hit rule "VARIABLE" on text 'a' at line 2
+Hit rule "DECLARATION_STATEMENT" on text 'a' at line 2
+	Error: syntax error detected at line 2 with yytext: ;

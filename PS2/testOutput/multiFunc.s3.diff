@@ -1,4 +1,4 @@
-1,37c1
+1,37d0
 <  PROGRAM()()
 <  FUNCTION_LIST()()
 <   FUNCTION_LIST()()
@@ -36,5 +36,3 @@
 <       EXPRESSION()()
 <        EXPRESSION()(VARIABLE)
 <         VARIABLE()("variable")()
----
-> 	Error: syntax error detected at line 1 with yytext: I

@@ -1,8 +1,4 @@
-1,569c1
-< Hit rule "VARIABLE" on text 'Inner' at line 1
-< Hit rule "TYPE" on text 'INT' at line 2
-< Hit rule "VARIABLE" on text 'a' at line 2
-< Hit rule "DECLARATION_STATEMENT" on text 'a' at line 2
+5,569c5
 < Hit rule "DECLARATION_LIST" on text ';' at line 2
 < Hit rule "TYPE" on text 'INT' at line 3
 < Hit rule "VARIABLE" on text 'b' at line 3
@@ -569,4 +565,4 @@
 < Hit rule "FUNCTION_LIST" on text 'END' at line 90
 < Hit rule "PROGRAM" on text '' at line 93
 ---
-> 	Error: syntax error detected at line 1 with yytext: C
+> 	Error: syntax error detected at line 2 with yytext: ;

@@ -507,4 +507,4 @@
 <           VARIABLE()("o")()
 <         VARIABLE()("i")()
 ---
-> 	Error: syntax error detected at line 1 with yytext: C
+> 	Error: syntax error detected at line 2 with yytext: ;

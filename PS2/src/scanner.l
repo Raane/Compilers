@@ -18,7 +18,7 @@ extern int outputStage; // This variable is located in vslc.c
 
 DIGIT [0-9]
 WHITESPACE [\ \n\t]
-LETTER [a-zA-Z]
+LETTER [a-zA-Z_]
 
 %%
 FUNC            { RETURN(FUNC); }
@@ -37,11 +37,11 @@ CLASS           { RETURN(_CLASS_); }
 HAS             { RETURN(HAS); }
 WITH            { RETURN(WITH); }
 START           { RETURN(START); }
-VIOD            { RETURN(VOID); }
+VOID            { RETURN(VOID); }
 THIS            { RETURN(THIS); }
 NEW             { RETURN(NEW); }
-TRUE            { RETURN(FALSE); }
-FALSE           { RETURN(FALSE); }
+TRUE            { RETURN(TRUE_CONST); }
+FALSE           { RETURN(FALSE_CONST); }
 ":="            { RETURN(ASSIGN); }
 "<="            { RETURN(GEQUAL); }
 ">="            { RETURN(LEQUAL); }
@@ -51,9 +51,9 @@ FALSE           { RETURN(FALSE); }
 "||"            { RETURN(OR); }
 "//"[^\n]*      { }
 {WHITESPACE}+   { }
-{DIGIT}+                    { yylval = atoi(yytext); RETURN(INT_CONST); }
 {DIGIT}+"."{DIGIT}+         { yylval = atoi(yytext); RETURN(FLOAT_CONST); }
-"\""[^\n]*"\""              { yylval = (intptr_t) yytext; RETURN(STRING_CONST); }
+{DIGIT}+                    { yylval = atoi(yytext); RETURN(INT_CONST); }
+"\""([^\n\"]|\\\")*"\""              { yylval = (intptr_t) yytext; RETURN(STRING_CONST); }
 {LETTER}({LETTER}|{DIGIT})* { yylval = (intptr_t) yytext; RETURN(IDENTIFIER); }
 .                           { RETURN( yytext[0] ); }
 %%

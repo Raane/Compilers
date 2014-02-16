@@ -1,7 +1,4 @@
-1,30c1
-< Hit rule "TYPE" on text 'VOID' at line 1
-< Hit rule "VARIABLE" on text 'one' at line 1
-< Hit rule "CONSTANT" on text '"Return value is "' at line 3
+4,30d3
 < Hit rule "EXPRESSION" on text '"Return value is "' at line 3
 < Hit rule "EXPRESSION_LIST" on text ',' at line 3
 < Hit rule "VARIABLE" on text 'two' at line 3
@@ -29,5 +26,3 @@
 < Hit rule "FUNCTION" on text 'END' at line 10
 < Hit rule "FUNCTION_LIST" on text 'END' at line 10
 < Hit rule "PROGRAM" on text '' at line 11
----
-> 	Error: syntax error detected at line 1 with yytext: V

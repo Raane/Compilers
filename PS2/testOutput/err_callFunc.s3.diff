@@ -1,4 +1,4 @@
-1,28c1
+1,28d0
 <  PROGRAM()()
 <  FUNCTION_LIST()()
 <   FUNCTION_LIST()()
@@ -27,5 +27,3 @@
 <      DECLARATION_STATEMENT()()
 <       TYPE(INTEGER)()
 <       VARIABLE()("a")()
----
-> 	Error: syntax error detected at line 1 with yytext: V

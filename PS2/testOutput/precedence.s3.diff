@@ -106,4 +106,4 @@
 <       EXPRESSION()(CONSTANT)
 <        CONSTANT(INTEGER)(0)()
 ---
-> 	Error: syntax error detected at line 1 with yytext: /
+> 	Error: syntax error detected at line 4 with yytext: ;

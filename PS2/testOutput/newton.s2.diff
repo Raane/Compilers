@@ -1,14 +1,4 @@
-1,136c1
-< Hit rule "TYPE" on text 'INT' at line 7
-< Hit rule "VARIABLE" on text 'newton' at line 7
-< Hit rule "TYPE" on text 'INT' at line 7
-< Hit rule "VARIABLE" on text 'n' at line 7
-< Hit rule "DECLARATION_STATEMENT" on text 'n' at line 7
-< Hit rule "VARIABLE_LIST" on text 'n' at line 7
-< Hit rule "PARAMETER_LIST" on text ')' at line 7
-< Hit rule "TYPE" on text 'INT' at line 9
-< Hit rule "VARIABLE" on text 'square_root' at line 9
-< Hit rule "DECLARATION_STATEMENT" on text 'square_root' at line 9
+11,136c11
 < Hit rule "STATEMENT" on text ';' at line 9
 < Hit rule "STATEMENT_LIST" on text ';' at line 9
 < Hit rule "VARIABLE" on text 'square_root' at line 10
@@ -136,4 +126,4 @@
 < Hit rule "FUNCTION_LIST" on text 'END' at line 26
 < Hit rule "PROGRAM" on text '' at line 27
 ---
-> 	Error: syntax error detected at line 1 with yytext: /
+> 	Error: syntax error detected at line 9 with yytext: ;

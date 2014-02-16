@@ -144,12 +144,11 @@ statement_list      : statement                                         { $$ = C
                     | statement_list statement                          { $$ = CN( statement_list_n, 2, $1, $2 ); };
 variable_list       : declaration_statement                             { $$ = CN( variable_list_n, 1, $1); }                                                                        //TODO
                     | variable_list ',' declaration_statement           { $$ = CN( variable_list_n, 2, $1, $3); }                                                                        //TODO
-                    | variable_list ',' INDEXED_variable                { $$ = CN( variable_list_n, 2, $1, $3 ); };*/
 expression_list     : expression                                        { $$ = CN( expression_list_n, 1, $1 ); }
                     | expression_list ',' expression                    { $$ = CN( expression_list_n, 2, $1, $3 ); };
-parameter_list      : variable_list                                     { $$ = CN( parameter_list_n, NULL, 1, $1 ); }               //TODO
+parameter_list      : variable_list                                     { $$ = CN( parameter_list_n, 1, $1 ); }               //TODO
                     |                                                   { $$ = NULL; };
-argument_list       : expression_list                                   { $$ = CN( argument_list_n, NULL, 1, $1 ); }
+argument_list       : expression_list                                   { $$ = CN( argument_list_n, 1, $1 ); }
                     |                                                   { $$ = NULL; };
 class_list          : class                                             { $$ = CN( class_list_n, 1, $1 ); }                                                                        //TODO
                     | class_list class                                  { $$ = CN( class_list_n, 2, $1, $2 ); }                                                                        //TODO
@@ -163,7 +162,7 @@ statement           : declaration_statement ','                         { $$ = C
                     | print_statement ','                               { $$ = CN( statement_n, 1, $1 ); }
                     | return_statement ','                              { $$ = CN( statement_n, 1, $1 ); }
                     | call ';'                                          { $$ = CN( statement_n, 1, $1 ); };
-declaration_statement : type variable                                   { $$ = CN( program_n, , ); }                                                                        //TODO
+declaration_statement : type variable                                   { $$ = CN( declaration_statement_n, 2, $1, $2); }                                                                        //TODO
 assignment_statement: variable ASSIGN expression                        { $$ = CN( assignment_statement_n, 2, $1, $3 ); };                //TODO?
 if_statement        : IF expression THEN statement_list ELSE statement END  { $$ = CN( if_statement_n, 3, $2, $4, $6 ); }                //TODO?
                     | IF expression THEN statement_list END                 { $$ = CN( if_statement_n, 2, $2, $4 ); };                   //TODO?
@@ -190,21 +189,21 @@ expression          : constant                                          { $$ = C
                     | THIS                                              { $$ = CNE( expression_n, this_e, 0); }
                     | lvalue                                            { $$ = CNE( expression_n, variable_e, 1, $1 ); }
                     | NEW type                                          { $$ = CNE( expression_n, new_e, 1, $2); }
-call                : variable '(' argument_list ')'                    { $$ = CN( expression_n, STRDUP("F"), 2, $1, $3 ); }                    //TODO
-                    | expression '.' variable '(' argument_list ')'     { $$ = CN( expression_n, STRDUP("A"), 2, $1, $3 ); };*/                 //TODO
-lvalue              : variable                                                                                                                  //TODO
-                    | expression '.' variable                                                                                                   //TODO
-constant            : TRUE_CONST                                                                                                                //TODO
-                    | FALSE_CONST                                                                                                               //TODO
-                    | INT_CONST                                                                                                                 //TODO
-                    | FLOAT_CONST                                                                                                               //TODO
-                    | STRING_CONST                                                                                                              //TODO
-type                : INT
-                    | FLOAT
-                    | BOOL
-                    | VOID
-                    | variable
-variable            : IDENTIFIER
+call                : variable '(' argument_list ')'                    { $$ = CNE( expression_n, meth_call_e, 2, $1, $3); }
+                    | expression '.' variable '(' argument_list ')'     { $$ = CNE( expression_n, meth_call_e, 3, $1, $3, $5); }
+lvalue              : variable                                          { $$ = CNE( expression_n, variable_e, 1, $1); }
+                    | expression '.' variable                           { $$ = CNE( expression_n, variable_e, 2, $1, $3); }
+constant            : TRUE_CONST                                        { $$ = CN(constant_n, 0); $$->bool_const = true; $$->data_type.base_type = BOOL_TYPE; }
+                    | FALSE_CONST                                       { $$ = CN(constant_n, 0); $$->bool_const = false; $$->data_type.base_type = BOOL_TYPE; }
+                    | INT_CONST                                         { $$ = CN(constant_n, 0); SetInteger($$, strdup(yytext)); }
+                    | FLOAT_CONST                                       { $$ = CN(constant_n, 0); SetFloat($$, strdup(yytext)); }
+                    | STRING_CONST                                      { $$ = CN(constant_n, 0); SetString($$, strdup(yytext)); }
+type                : INT                                               { $$ = CNT(type_n, INT_TYPE, 0); }
+                    | FLOAT                                             { $$ = CNT(type_n, FLOAT_TYPE, 0); }
+                    | BOOL                                              { $$ = CNT(type_n, BOOL_TYPE, 0); }
+                    | VOID                                              { $$ = CNT(type_n, VOID_TYPE, 0); }
+                    | variable                                          { $$ = CNT(type_n, CLASS_TYPE, 1, $1); };  // set base datatype to CLASS_TYPE
+variable            : IDENTIFIER                                        { $$ = CNL(variable_n, strdup(yytext), 0); };
 
 %% 
 
