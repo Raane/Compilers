@@ -36,8 +36,8 @@ Node_t *simplify_function ( Node_t *root, int depth )
 
     root->data_type = root->children[0]->data_type;
     root->label = root->children[1]->label;
-    //free(root->children[0]);
-    //free(root->children[1]);
+    free(root->children[0]);
+    free(root->children[1]);
     Node_t** newChildren = malloc((root->n_children-2) * sizeof(Node_t));
     int i=0;
     for(i=0;i<(root->n_children-2);i++) {
@@ -56,8 +56,7 @@ Node_t *simplify_class( Node_t *root, int depth )
     simplify_children(root, depth);
 
     root->label = root->children[0]->label;
-    //free(root->children[0]);
-    //free(root->children[1]);
+    free(root->children[0]);
     Node_t** newChildren = malloc((root->n_children-1) * sizeof(Node_t));
     int i=0;
     for(i=0;i<(root->n_children-1);i++) {
@@ -97,10 +96,9 @@ Node_t *simplify_single_child ( Node_t *root, int depth )
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     simplify_children(root, depth);
 
-    //Node_t* child = root->children[0];
-    //free(root);
-    //TODO: Free stuff
-    *root = *(root->children[0]);
+    Node_t* child = root->children[0];
+    free(root->children);
+    *root = *child;
 
 }
 
