@@ -108,7 +108,7 @@ Node_t *simplify_list_with_null ( Node_t *root, int depth )
     if(outputStage == 4)
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     simplify_children(root, depth);
-    
+
     if(root->children[0]==NULL) {
         Node_t* nonNullChild = root->children[1];
         free(root->children);
@@ -147,22 +147,27 @@ Node_t *simplify_list ( Node_t *root, int depth )
     }
 }
 
+//
 Node_t *simplify_expression ( Node_t *root, int depth )
 {
     if(outputStage == 4)
         fprintf ( stderr, "%*cSimplify %s (%s) \n", depth, ' ', root->nodetype.text, root->expression_type.text );
     simplify_children(root, depth);
     if(root->expression_type.index==DEFAULT_E || root->expression_type.index==CONSTANT_E || root->expression_type.index==VARIABLE_E) {
-        *root = *(root->children[0]);
+        Node_t* child = root->children[0];
+        free(root->children);
+        *root = *child;
     }
 
 }
 
+/*
+ * Call the simplify function on each of the children recursivly down until a leafnode or NULL node is found.
+ */
 void simplify_children(Node_t *root, int depth) {
     int i;
     for(i=0;i<root->n_children;i++) {
         if(root->children[i]!=NULL) {
-    //        fprintf ( stderr, "Simplify %d \n", (root->children[i]->nodetype) );
             root->children[i]->simplify(root->children[i], depth+1);
         }
     }
