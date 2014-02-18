@@ -10,16 +10,16 @@ void remove_the_n_first_children( Node_t *root, int n);
 void simplify_single_child_helper( Node_t *root);
 
 /*
- *
+ * The default for a node that doesn't require any special actions is to call all their childrens simplify functions.
  */
 Node_t* simplify_default ( Node_t *root, int depth )
 {
     simplify_children(root, depth);
 }
 
-
 /*
- *
+ * The base_type and class_name childrens base_type and class_name are moved to the parrent and the children are destroyed.
+ * The remaining children is moved to a new children array of a smaller size.
  */
 Node_t *simplify_types ( Node_t *root, int depth )
 {
@@ -33,7 +33,8 @@ Node_t *simplify_types ( Node_t *root, int depth )
 
 
 /*
- *
+ * The label and data_type childrens label and data_type are moved to the parrent and the children are destroyed.
+ * The remaining children is moved to a new children array of a smaller size.
  */
 Node_t *simplify_function ( Node_t *root, int depth )
 {
@@ -48,7 +49,8 @@ Node_t *simplify_function ( Node_t *root, int depth )
 
 
 /*
- * This can't get helper
+ * The label childs label is moved to the parrent and the child is destroyed.
+ * The remaining children is moved to a new children array of a smaller size.
  */
 Node_t *simplify_class( Node_t *root, int depth )
 {
@@ -70,7 +72,8 @@ Node_t *simplify_class( Node_t *root, int depth )
 
 
 /*
- *
+ * The data type and label children have their properties moved to the parrent before being destroyed. 
+ * The remaining children is moved to a new children array of a smaller size.
  */
 Node_t *simplify_declaration_statement ( Node_t *root, int depth )
 {
@@ -78,7 +81,6 @@ Node_t *simplify_declaration_statement ( Node_t *root, int depth )
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     simplify_children(root, depth);
 
-    //TODO: This is copy pasted, could be hard coded more, as this is just ripped from function
     root->data_type = root->children[0]->data_type;
     root->label = root->children[1]->label;
     remove_the_n_first_children(root, 2);
@@ -86,7 +88,7 @@ Node_t *simplify_declaration_statement ( Node_t *root, int depth )
 
 
 /*
- *
+ * Move the only child up one level to replace it's parrent
  */
 Node_t *simplify_single_child ( Node_t *root, int depth )
 {
@@ -98,7 +100,9 @@ Node_t *simplify_single_child ( Node_t *root, int depth )
 }
 
 /*
- *
+ * There are two cases for lists with potential NULL. If their first child is NULL
+ * the NULL child is simply removed and the remaining child is made to be the only child.
+ * Else there children of the non-terminal children is hoisted up one level in the three.
  */
 Node_t *simplify_list_with_null ( Node_t *root, int depth )
 {
@@ -127,7 +131,7 @@ Node_t *simplify_list_with_null ( Node_t *root, int depth )
 
 
 /*
- *
+ * All list with 2 children are simplified by setting all the children of the 1st child to be direct children.
  */
 Node_t *simplify_list ( Node_t *root, int depth )
 {
@@ -148,7 +152,7 @@ Node_t *simplify_list ( Node_t *root, int depth )
 }
 
 /*
- *
+ * Most expressions does not require simplification, but the ones that do are simplified here.
  */
 Node_t *simplify_expression ( Node_t *root, int depth )
 {
@@ -173,6 +177,9 @@ void simplify_children(Node_t *root, int depth) {
     }
 }
 
+/*
+ * Remove the first n children from the children array and move the remaining children into a new smaller array.
+ */
 void remove_the_n_first_children( Node_t *root, int n) {
     Node_t** newChildren = malloc((root->n_children-n) * sizeof(Node_t));
     int i=0;
@@ -185,6 +192,9 @@ void remove_the_n_first_children( Node_t *root, int n) {
     root->n_children = root->n_children-2;
 }
 
+/*
+ *
+ */
 void simplify_single_child_helper( Node_t *root) {
     Node_t* child = root->children[0];
     free(root->children);
