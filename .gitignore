@@ -1,5 +1,7 @@
 # TestOutput
 */testOutput/*
+*.swp
+*.swo
 
 # Object files
 *.o
