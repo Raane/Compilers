@@ -1,14 +1,26 @@
 #include "simplifynodes.h"
 
 extern int outputStage; // This variable is located in vslc.c
+/*
+ * These three lines would normally be in the header file, but they are here because
+ * we were asked to only deliver the .c file.
+ */
 void simplify_children( Node_t *root, int depth );
+void remove_the_n_first_children( Node_t *root, int n);
+void simplify_single_child_helper( Node_t *root);
 
+/*
+ *
+ */
 Node_t* simplify_default ( Node_t *root, int depth )
 {
     simplify_children(root, depth);
 }
 
 
+/*
+ *
+ */
 Node_t *simplify_types ( Node_t *root, int depth )
 {
     if(outputStage == 4)
@@ -28,6 +40,9 @@ Node_t *simplify_types ( Node_t *root, int depth )
 }
 
 
+/*
+ *
+ */
 Node_t *simplify_function ( Node_t *root, int depth )
 {
     if(outputStage == 4)
@@ -49,6 +64,9 @@ Node_t *simplify_function ( Node_t *root, int depth )
 }
 
 
+/*
+ *
+ */
 Node_t *simplify_class( Node_t *root, int depth )
 {
     if(outputStage == 4)
@@ -68,6 +86,9 @@ Node_t *simplify_class( Node_t *root, int depth )
 }
 
 
+/*
+ *
+ */
 Node_t *simplify_declaration_statement ( Node_t *root, int depth )
 {
     if(outputStage == 4)
@@ -79,32 +100,27 @@ Node_t *simplify_declaration_statement ( Node_t *root, int depth )
     root->label = root->children[1]->label;
     free(root->children[0]);
     free(root->children[1]);
-    Node_t** newChildren = malloc((root->n_children-2) * sizeof(Node_t));
-    int i=0;
-    for(i=0;i<(root->n_children-2);i++) {
-        newChildren[i] = root->children[i+2];
-    }
-    free(root->children);
-    root->children = newChildren;
-    root->n_children = root->n_children-2;
+    remove_the_n_first_children(root, 2);
 }
 
 
+/*
+ *
+ */
 Node_t *simplify_single_child ( Node_t *root, int depth )
 {
     if(outputStage == 4)
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     simplify_children(root, depth);
 
-    Node_t* child = root->children[0];
-    free(root->children);
-    *root = *child;
-
+    simplify_single_child_helper(root);
 }
 
+/*
+ *
+ */
 Node_t *simplify_list_with_null ( Node_t *root, int depth )
 {
-    // here we can't look at all children, as some of them may be null
     if(outputStage == 4)
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     simplify_children(root, depth);
@@ -129,6 +145,9 @@ Node_t *simplify_list_with_null ( Node_t *root, int depth )
 }
 
 
+/*
+ *
+ */
 Node_t *simplify_list ( Node_t *root, int depth )
 {
     if(outputStage == 4)
@@ -147,16 +166,16 @@ Node_t *simplify_list ( Node_t *root, int depth )
     }
 }
 
-//
+/*
+ *
+ */
 Node_t *simplify_expression ( Node_t *root, int depth )
 {
     if(outputStage == 4)
         fprintf ( stderr, "%*cSimplify %s (%s) \n", depth, ' ', root->nodetype.text, root->expression_type.text );
     simplify_children(root, depth);
     if(root->expression_type.index==DEFAULT_E || root->expression_type.index==CONSTANT_E || root->expression_type.index==VARIABLE_E) {
-        Node_t* child = root->children[0];
-        free(root->children);
-        *root = *child;
+        simplify_single_child_helper(root);
     }
 
 }
@@ -171,4 +190,21 @@ void simplify_children(Node_t *root, int depth) {
             root->children[i]->simplify(root->children[i], depth+1);
         }
     }
+}
+
+void remove_the_n_first_children( Node_t *root, int n) {
+    Node_t** newChildren = malloc((root->n_children-n) * sizeof(Node_t));
+    int i=0;
+    for(i=0;i<(root->n_children-n);i++) {
+        newChildren[i] = root->children[i+2];
+    }
+    free(root->children);
+    root->children = newChildren;
+    root->n_children = root->n_children-2;
+}
+
+void simplify_single_child_helper( Node_t *root) {
+    Node_t* child = root->children[0];
+    free(root->children);
+    *root = *child;
 }
