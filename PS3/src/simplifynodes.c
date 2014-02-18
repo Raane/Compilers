@@ -15,8 +15,7 @@ Node_t *simplify_types ( Node_t *root, int depth )
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     if(root->data_type.base_type == CLASS_TYPE) {
         root->data_type.class_name = root->children[0]->label;
-        //free(root->children[0]);
-        //free(root->children[1]);
+        free(root->children[0]);
         Node_t** newChildren = malloc((root->n_children-1) * sizeof(Node_t));
         int i=0;
         for(i=0;i<(root->n_children-1);i++) {
