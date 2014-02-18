@@ -8,7 +8,9 @@ extern int outputStage;
 static char **strings;
 static int strings_size = 16, strings_index = -1;
 
-
+/*
+ * Initialize the variables and create the table we will use to store the strings.
+ */
 void symtab_init ( void )
 {
     strings_size=0;
@@ -16,7 +18,9 @@ void symtab_init ( void )
     strings = malloc(0);
 }
 
-
+/*
+ * Free all memory used for the data structures used to store the strings.
+ */
 void symtab_finalize ( void )
 {
     int i;
@@ -26,7 +30,13 @@ void symtab_finalize ( void )
     free(strings);
 }
 
-
+/*
+ * Expand the array with the strings and add the new one.
+ * Please note that if there was a risk of really large abounts of strings 
+ * we should probably expand the array by many places every time it is necessary.
+ * I do however not believe that anyone will ever have a vsl program that is so large 
+ * that this extra time consumption of the compiler will be an issue.
+ */
 int strings_add ( char *str )
 {
     strings_index++;
