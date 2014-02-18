@@ -27,15 +27,7 @@ Node_t *simplify_types ( Node_t *root, int depth )
         fprintf ( stderr, "%*cSimplify %s \n", depth, ' ', root->nodetype.text );
     if(root->data_type.base_type == CLASS_TYPE) {
         root->data_type.class_name = root->children[0]->label;
-        free(root->children[0]);
-        Node_t** newChildren = malloc((root->n_children-1) * sizeof(Node_t));
-        int i=0;
-        for(i=0;i<(root->n_children-1);i++) {
-            newChildren[i] = root->children[i+1];
-        }
-        free(root->children);
-        root->children = newChildren;
-        root->n_children = root->n_children-1;
+        remove_the_n_first_children(root, 1);
     }
 }
 
@@ -51,21 +43,12 @@ Node_t *simplify_function ( Node_t *root, int depth )
 
     root->data_type = root->children[0]->data_type;
     root->label = root->children[1]->label;
-    free(root->children[0]);
-    free(root->children[1]);
-    Node_t** newChildren = malloc((root->n_children-2) * sizeof(Node_t));
-    int i=0;
-    for(i=0;i<(root->n_children-2);i++) {
-        newChildren[i] = root->children[i+2];
-    }
-    free(root->children);
-    root->children = newChildren;
-    root->n_children = root->n_children-2;
+    remove_the_n_first_children(root, 2);
 }
 
 
 /*
- *
+ * This can't get helper
  */
 Node_t *simplify_class( Node_t *root, int depth )
 {
@@ -98,8 +81,6 @@ Node_t *simplify_declaration_statement ( Node_t *root, int depth )
     //TODO: This is copy pasted, could be hard coded more, as this is just ripped from function
     root->data_type = root->children[0]->data_type;
     root->label = root->children[1]->label;
-    free(root->children[0]);
-    free(root->children[1]);
     remove_the_n_first_children(root, 2);
 }
 
@@ -196,6 +177,7 @@ void remove_the_n_first_children( Node_t *root, int n) {
     Node_t** newChildren = malloc((root->n_children-n) * sizeof(Node_t));
     int i=0;
     for(i=0;i<(root->n_children-n);i++) {
+        free(root->children[i]);
         newChildren[i] = root->children[i+2];
     }
     free(root->children);
