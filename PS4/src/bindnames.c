@@ -17,7 +17,12 @@ int bind_function ( node_t *root, int stackOffset)
 	if(outputStage == 6)
 		fprintf ( stderr, "FUNCTION: Start: %s\n", root->label);
 
-
+    int i;
+    for(i=0;i<root->n_children;i++) {
+        if(root->children[i] != NULL) {
+            root->children[i]->bind_names(root->children[i], stackOffset);
+        }
+    }
 
 	if(outputStage == 6)
 		fprintf ( stderr, "FUNCTION: End\n");
@@ -29,6 +34,10 @@ int bind_declaration_list ( node_t *root, int stackOffset)
 	if(outputStage == 6)
 		fprintf ( stderr, "DECLARATION_LIST: Start\n");
 
+    int i;
+    for(i=0;i<root->n_children;i++) {
+        root->children[i]->bind_names(root->children[i], stackOffset);
+    }
 
 
 	if(outputStage == 6)
@@ -41,6 +50,10 @@ int bind_class ( node_t *root, int stackOffset)
 	if(outputStage == 6)
 		fprintf(stderr, "CLASS: Start: %s\n", root->children[0]->label);
 
+    int i;
+    for(i=0;i<root->n_children;i++) {
+        root->children[i]->bind_names(root->children[i], stackOffset);
+    }
 	
 
 	if(outputStage == 6)
@@ -61,7 +74,6 @@ int bind_function_list ( node_t *root, int stackOffset)
     int i;
     for(i=0;i<root->n_children;i++) {
         root->children[i]->bind_names(root->children[i], stackOffset);
-        //root->children[i]->simplify(root->children[i], depth+1);
     }
     
 
@@ -101,6 +113,10 @@ int bind_expression( node_t* root, int stackOffset)
 	if(outputStage == 6)
 		fprintf( stderr, "EXPRESSION: Start: %s\n", root->expression_type.text);
 
+    int i;
+    for(i=0;i<root->n_children;i++) {
+        root->children[i]->bind_names(root->children[i], stackOffset);
+    }
 	
 
 	if(outputStage == 6)
