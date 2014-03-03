@@ -58,7 +58,12 @@ int bind_function_list ( node_t *root, int stackOffset)
 	if(outputStage == 6)
 		fprintf ( stderr, "FUNCTION_LIST: Start\n");
 
-	
+    int i;
+    for(i=0;i<root->n_children;i++) {
+        root->children[i]->bind_names(root->children[i], stackOffset);
+        //root->children[i]->simplify(root->children[i], depth+1);
+    }
+    
 
 	if(outputStage == 6)
 		fprintf ( stderr, "FUNCTION_LIST: End\n");
