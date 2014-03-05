@@ -17,11 +17,17 @@ int bind_function ( node_t *root, int stackOffset)
     if(outputStage == 6)
         fprintf ( stderr, "FUNCTION: Start: %s\n", root->label);
 
-    int i;
-    for(i=0;i<root->n_children;i++) {
-        if(root->children[i] != NULL) {
-            root->children[i]->bind_names(root->children[i], stackOffset);
+    if(root->children[0] != NULL) {
+        int i;
+        for(i=0;i<root->children[0]->n_children;i++) {
+            root->children[0]->children[i]->bind_names(root->children[0]->children[i], (root->children[0]->n_children-i)*4+4);
         }
+        //root->children[0]->bind_names(root->children[0], 8);
+    }
+    //root->children[1]->bind_names(root->children[1], 0);
+    int i;
+    for(i=0;i<root->children[1]->n_children;i++) {
+        root->children[1]->children[i]->bind_names(root->children[1]->children[i], -(i+1)*4);
     }
 
     if(outputStage == 6)
@@ -119,11 +125,17 @@ int bind_expression( node_t* root, int stackOffset)
     if(outputStage == 6)
         fprintf( stderr, "EXPRESSION: Start: %s\n", root->expression_type.text);
 
-    int i;
-    for(i=0;i<root->n_children;i++) {
-        if(root->children[i] != NULL) {
-            root->children[i]->bind_names(root->children[i], stackOffset);
-        }
+    int i = 0;
+    switch(root->expression_type.index) {
+        case FUNC_CALL_E:
+            i=1;
+        default:
+            for(;i<root->n_children;i++) {
+                if(root->children[i] != NULL) {
+                    root->children[i]->bind_names(root->children[i], stackOffset);
+                }
+            }
+            break;
     }
 
 
