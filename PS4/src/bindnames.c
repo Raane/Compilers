@@ -43,7 +43,7 @@ int bind_declaration_list ( node_t *root, int stackOffset)
     int i;
     for(i=0;i<root->n_children;i++) {
         if(root->children[i] != NULL) {
-            root->children[i]->bind_names(root->children[i], stackOffset);
+            root->children[i]->bind_names(root->children[i], -i*4);
         }
     }
 

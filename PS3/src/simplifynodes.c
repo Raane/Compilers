@@ -61,7 +61,7 @@ Node_t *simplify_class( Node_t *root, int depth )
     root->label = root->children[0]->label;
     free(root->children[0]);
     Node_t** newChildren = malloc((root->n_children-1) * sizeof(Node_t));
-    int i=0;
+    int i;
     for(i=0;i<(root->n_children-1);i++) {
         newChildren[i] = root->children[i+1];
     }
