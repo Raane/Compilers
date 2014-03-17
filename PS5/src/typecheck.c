@@ -60,5 +60,10 @@ data_type_t typecheck_variable(node_t* root){
 
 data_type_t typecheck_assignment(node_t* root)
 {
-
+    data_type_t type_left = root->children[0]->typecheck(root->children[0]);
+    data_type_t type_right = root->children[1]->typecheck(root->children[1]);
+    if(type_left.base_type != type_right.base_type) {
+        type_error(root);
+    }
+    return type_left;
 }
