@@ -40,12 +40,12 @@ data_type_t typecheck_expression(node_t* root)
     if(root->expression_type.index == FUNC_CALL_E || root->expression_type.index == METH_CALL_E) {
         function_symbol_t *function_symbol = function_get(root->children[0]->label);
         int i;
-        for(i=0;i<function_symbol.nArguments;i++) {
+        for(i=0;i<function_symbol->nArguments;i++) {
             /* 
              * Note that there is no need to check for root->children[1] != NULL here as 
-             * NULL would only occur when function_symbol.nArguments is 0.
+             * NULL would only occur when function_symbol->nArguments is 0.
              */
-            if(root->children[1]->children[i]->typecheck(root->children[1]->children[i]) != function_symbol.argument_types[i]) {
+            if(root->children[1]->children[i]->typecheck(root->children[1]->children[i]).base_type != function_symbol->argument_types[i].base_type) {
                 type_error(root);
             }
         }
