@@ -39,14 +39,19 @@ data_type_t typecheck_expression(node_t* root)
 
     if(root->expression_type.index == FUNC_CALL_E || root->expression_type.index == METH_CALL_E) {
         function_symbol_t *function_symbol = function_get(root->children[0]->label);
-        int i;
-        for(i=0;i<function_symbol->nArguments;i++) {
-            /* 
-             * Note that there is no need to check for root->children[1] != NULL here as 
-             * NULL would only occur when function_symbol->nArguments is 0.
-             */
-            if(root->children[1]->children[i]->typecheck(root->children[1]->children[i]).base_type != function_symbol->argument_types[i].base_type) {
-                type_error(root);
+                /*
+                 * The if clause check that the number of arguments match the number in the call.
+                 * In the else clause the arguments types are checked against the symbol table entry.
+                 */
+        if((root->children[1] == NULL && function_symbol->nArguments != 0) ||
+                (root->children[1] != NULL && root->children[1]->n_children != function_symbol->nArguments )) {
+            type_error(root);
+        } else {
+            int i;
+            for(i=0;i<function_symbol->nArguments;i++) {
+                if(root->children[1]->children[i]->typecheck(root->children[1]->children[i]).base_type != function_symbol->argument_types[i].base_type) {
+                    type_error(root);
+                }
             }
         }
         toReturn = function_symbol->return_type;
