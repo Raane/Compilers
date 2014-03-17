@@ -49,12 +49,9 @@ data_type_t typecheck_expression(node_t* root)
                 type_error(root);
             }
         }
-
-
+        toReturn = function_symbol->return_type;
     }
-
-    //Insert additional checking here
-
+    return toReturn;
 }
 
 data_type_t typecheck_variable(node_t* root){
