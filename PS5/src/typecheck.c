@@ -20,7 +20,7 @@ void type_error(node_t* root){
 
 int equal_types(data_type_t a, data_type_t b)
 {
-
+    return a.base_type == b.base_type;
 }
 
 data_type_t typecheck_default(node_t* root)
@@ -49,7 +49,7 @@ data_type_t typecheck_expression(node_t* root)
         } else {
             int i;
             for(i=0;i<function_symbol->nArguments;i++) {
-                if(root->children[1]->children[i]->typecheck(root->children[1]->children[i]).base_type != function_symbol->argument_types[i].base_type) {
+                if(!equal_types(root->children[1]->children[i]->typecheck(root->children[1]->children[i]), function_symbol->argument_types[i])) {
                     type_error(root);
                 }
             }
@@ -67,7 +67,7 @@ data_type_t typecheck_assignment(node_t* root)
 {
     data_type_t type_left = root->children[0]->typecheck(root->children[0]);
     data_type_t type_right = root->children[1]->typecheck(root->children[1]);
-    if(type_left.base_type != type_right.base_type) {
+    if(!equal_types(type_left, type_right)) {
         type_error(root);
     }
     return type_left;
