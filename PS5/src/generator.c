@@ -14,7 +14,7 @@ typedef enum {
 /* Registers */
 // stackpointer = r13 = sp, framepointer = r11 / r7 = fp, linkregister (return address) = r14 = lr
 static char
-*lr = "lr", *r0 = "r0", *r1 = "r1", *r2 = "r2", *r3 = "r3",
+	*lr = "lr", *r0 = "r0", *r1 = "r1", *r2 = "r2", *r3 = "r3",
 	*fp = "fp", *sp = "sp", *r5 = "r5", *r6 = "r6",
 	*d0 = "d0", *d1="d1", *s0 = "s0", *s1 = "s1";
 
@@ -106,6 +106,7 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 	/* Output the data segment */
 	if( outputStage == 12 )
 		strings_output ( stderr );
+
 	instruction_add ( STRING, STRDUP( ".text" ), NULL, 0, 0 );
 
 	tracePrint("Starting PROGRAM\n");
@@ -114,13 +115,15 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 
 	TEXT_DEBUG_FUNC_ARM();
 	TEXT_HEAD_ARM();
-
+	
+	node_t* program_function_list = root->children[root->n_children-1];
+	node_t* first_function = program_function_list->children[0];
+	instruction_add(CALL, STRDUP(first_function->label), NULL, 0, 0);
 
 	/* TODO: Insert a call to the first defined function here */
-
-	instruction_add(LABEL, STRDUP("func"), NULL, 0, 0);
-	
-
+	for ( int i=0; i<root->n_children; i++ )
+		if( root->children[i] != NULL )
+			root->children[i]->generate ( root->children[i], scopedepth );
 
 
 	tracePrint("End PROGRAM\n");
@@ -139,8 +142,8 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
 
 
 	tracePrint ( "Starting FUNCTION (%s) with depth %d\n", root->label, scopedepth);
-
-
+	
+	
 
 
 	//Leaving the scope, decreasing depth
