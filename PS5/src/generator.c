@@ -118,6 +118,9 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 
 	/* TODO: Insert a call to the first defined function here */
 
+	instruction_add(LABEL, STRDUP("func"), NULL, 0, 0);
+	
+
 
 
 	tracePrint("End PROGRAM\n");
