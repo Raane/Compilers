@@ -16,7 +16,7 @@ typedef enum {
 static char
 	*lr = "lr", *r0 = "r0", *r1 = "r1", *r2 = "r2", *r3 = "r3",
 	*fp = "fp", *sp = "sp", *r5 = "r5", *r6 = "r6",
-	*d0 = "d0", *d1="d1", *s0 = "s0", *s1 = "s1";
+	*d0 = "d0", *d1="d1", *s0 = "s0", *s1 = "s1", *pc = "pc";
 
 
 /* A struct to make linked lists from instructions */
@@ -151,10 +151,8 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
 
 	instruction_add(MOVE, sp, fp, 0, 0);
 	instruction_add(POP, fp, NULL, 0, 0);
-//	instruction_add(POP, pc, NULL, 0, 0);
+	instruction_add(POP, pc, NULL, 0, 0);
 	
-
-
 	//Leaving the scope, decreasing depth
 	tracePrint ("Leaving FUNCTION (%s) with depth %d\n", root->label, scopedepth);
 
