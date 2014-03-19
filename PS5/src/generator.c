@@ -143,6 +143,15 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
 
 	tracePrint ( "Starting FUNCTION (%s) with depth %d\n", root->label, scopedepth);
 	
+	instruction_add(PUSH, lr, NULL, 0, 0);
+	instruction_add(PUSH, fp, NULL, 0, 0);
+	instruction_add(MOVE, fp, sp, 0, 0);
+
+	/* Execute all code in the function */
+
+	instruction_add(MOVE, sp, fp, 0, 0);
+	instruction_add(POP, fp, NULL, 0, 0);
+//	instruction_add(POP, pc, NULL, 0, 0);
 	
 
 
