@@ -181,7 +181,8 @@ void gen_DECLARATION_STATEMENT (node_t *root, int scopedepth)
 {
 	tracePrint("Starting DECLARATION: adding space on stack\n");
 
-
+	// Push arbitrary data onto the stack to extend it.
+	instruction_add(PUSH, r0, NULL, 0, 0);
 
 	tracePrint("Ending DECLARATION\n");
 }
