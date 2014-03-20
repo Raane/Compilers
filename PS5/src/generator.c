@@ -301,16 +301,20 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 	char string[17]; // 17 chars will fit .STRING plus any 32 bit number
 	switch( t ) {
 		case INT_TYPE:
-			//instruction_add(MOVE32, STRDUP(root->int_const), NULL, 0, 0);
+			sprintf(string, "%d", 22);
+			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case STRING_TYPE:
-			sprintf(string, ".STRING%d", root->string_index);
+			sprintf(string, "\\.STRING%d", root->string_index);
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case BOOL_TYPE: 	
-			//if(root->bool_const;
+			sprintf(string, "%d", root->bool_const?1:0);
+			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		default:
+			sprintf(string, "%d", root->int_const);
+			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 	}
 
@@ -383,10 +387,10 @@ instructions_print ( FILE *stream )
 					   instruction_add(STRING, STRDUP(buff2), NULL, 0,0);
 					 */
 					//TODO: Get rid of this hard coded stuff. 
-					fprintf ( stream, "\tmovw\t%s, #:lower16:.%s\n",
+					fprintf ( stream, "\tmovw\t%s, #:lower16:%s\n",
 							this->operands[1], this->operands[0]+1
 						);
-				fprintf ( stream, "\tmovt\t%s, #:upper16:.%s\n",
+				fprintf ( stream, "\tmovt\t%s, #:upper16:%s\n",
 						this->operands[1], this->operands[0]+1
 					);
 				break;
