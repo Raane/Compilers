@@ -301,7 +301,7 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 	char string[17]; // 17 chars will fit .STRING plus any 32 bit number
 	switch( t ) {
 		case INT_TYPE:
-			sprintf(string, "%d", 22);
+			sprintf(string, "#%d", 22);
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case STRING_TYPE:
@@ -309,11 +309,11 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case BOOL_TYPE: 	
-			sprintf(string, "%d", root->bool_const?1:0);
+			sprintf(string, "#%d", root->bool_const?1:0);
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		default:
-			sprintf(string, "%d", root->int_const);
+			sprintf(string, "#%d", root->int_const);
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 	}
