@@ -111,20 +111,24 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 
 	tracePrint("Starting PROGRAM\n");
 
+	/* This line was removed as I do not see the purpose it serve */
 	gen_default(root, scopedepth);//RECUR();
 
 	TEXT_DEBUG_FUNC_ARM();
 	TEXT_HEAD_ARM();
 	
+//	node_t* program_function_list = root->children[root->n_children-1];
+//	node_t* first_function = program_function_list->children[0];
+//	instruction_add(CALL, STRDUP(first_function->label), NULL, 0, 0);
+
+	/* TODO: Insert a call to the first defined function here */
 	node_t* program_function_list = root->children[root->n_children-1];
 	node_t* first_function = program_function_list->children[0];
 	instruction_add(CALL, STRDUP(first_function->label), NULL, 0, 0);
-
-	/* TODO: Insert a call to the first defined function here */
-	for ( int i=0; i<root->n_children; i++ )
+	/*for ( int i=1; i<root->n_children; i++ )
 		if( root->children[i] != NULL )
 			root->children[i]->generate ( root->children[i], scopedepth );
-
+*/
 
 	tracePrint("End PROGRAM\n");
 
@@ -143,12 +147,22 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
 
 	tracePrint ( "Starting FUNCTION (%s) with depth %d\n", root->label, scopedepth);
 	
+	/* Add the label */
+	instruction_add(LABEL, STRDUP(root->label), NULL, 0, 0);
+
+	/* Store data related to the return after this function */
 	instruction_add(PUSH, lr, NULL, 0, 0);
 	instruction_add(PUSH, fp, NULL, 0, 0);
 	instruction_add(MOVE, fp, sp, 0, 0);
+//
+//	/* Execute all code in the function */
+	gen_default(root, scopedepth+1);//RECUR();
+//	for ( int i=0; i<root->n_children; i++ )
+//		if( root->children[i] != NULL )
+//			root->children[i]->generate ( root->children[i], scopedepth );
 
-	/* Execute all code in the function */
 
+	/* Restore data related to the return after this function */
 	instruction_add(MOVE, sp, fp, 0, 0);
 	instruction_add(POP, fp, NULL, 0, 0);
 	instruction_add(POP, pc, NULL, 0, 0);
