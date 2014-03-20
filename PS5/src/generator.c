@@ -298,12 +298,14 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 {
 	tracePrint("Starting CONSTANT\n");
 	base_data_type_t t = root->data_type.base_type;
+	char string[17]; // 17 chars will fit .STRING plus any 32 bit number
 	switch( t ) {
 		case INT_TYPE:
-			instruction_add(MOVE32, STRDUP(root->int_const), NULL, 0, 0);
+			//instruction_add(MOVE32, STRDUP(root->int_const), NULL, 0, 0);
 			break;
 		case STRING_TYPE:
-			instruction_add(MOVE32, STRDUP(".STRING0"), r0, 0, 0);
+			sprintf(string, ".STRING%d", root->string_index);
+			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case BOOL_TYPE: 	
 			//if(root->bool_const;
