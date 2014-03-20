@@ -297,21 +297,23 @@ void gen_VARIABLE ( node_t *root, int scopedepth )
 void gen_CONSTANT (node_t * root, int scopedepth)
 {
 	tracePrint("Starting CONSTANT\n");
-/*
-	switch(root->entry->type.base_type) {
+	base_data_type_t t = root->data_type.base_type;
+	switch( t ) {
 		case INT_TYPE:
-			//instruction_add(MOVE32, STRDUP(root->int_const), NULL, 0, 0);
+			instruction_add(MOVE32, STRDUP(root->int_const), NULL, 0, 0);
 			break;
 		case STRING_TYPE:
-			instruction_add(MOVE32, STRDUP(".STRING0"), r1, 0, 0);
+			instruction_add(MOVE32, STRDUP(".STRING0"), r0, 0, 0);
 			break;
 		case BOOL_TYPE: 	
 			//if(root->bool_const;
 			break;
-	} 
-*/
+		default:
+			break;
+	}
+
         //instruction_add(LOAD, r1, fp, 0, root->entry->stack_offset);
-	instruction_add(MOVE32, STRDUP(".STRING0"), r0, 0, 0);
+	//instruction_add(MOVE32, STRDUP(".STRING0"), r0, 0, 0);
         instruction_add(PUSH, r0, NULL, 0, 0);	
 
 
@@ -378,6 +380,7 @@ instructions_print ( FILE *stream )
 					   snprintf(buff2, 100, "\tmovt	r0, #:upper16:%s", buff);
 					   instruction_add(STRING, STRDUP(buff2), NULL, 0,0);
 					 */
+					//TODO: Get rid of this hard coded stuff. 
 					fprintf ( stream, "\tmovw\t%s, #:lower16:.%s\n",
 							this->operands[1], this->operands[0]+1
 						);
