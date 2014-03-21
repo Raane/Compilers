@@ -267,11 +267,12 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
 		case FUNC_CALL_E:
 
-			
-			for(int i=0;i<root->n_children;i++) {
-				char string[2]; // 2 chars will fit r plus any one digit number
-				sprintf(string, "r%d", i);
-				instruction_add(PUSH, STRDUP(string), NULL, 0, 0);
+			if(root->children[1]!=NULL) {	
+				for(int i=0;i<root->children[1]->n_children;i++) {
+					char string[2]; // 2 chars will fit r plus any one digit number
+					sprintf(string, "r%d", i);
+					instruction_add(PUSH, STRDUP(string), NULL, 0, 0);
+				}
 			}
 			instruction_add(CALL, STRDUP(root->function_entry->label), NULL, 0, 0);
 			instruction_add(POP, r0, NULL, 0, 0);
@@ -345,7 +346,11 @@ void gen_RETURN_STATEMENT ( node_t *root, int scopedepth )
 {
 
 	tracePrint ( "Starting RETURN_STATEMENT\n");
-
+	// Call generation on all the return statements children
+	gen_default(root, scopedepth);//RECUR();
+	// After the calls, the top of the stack should contain the correct return value.
+	// This value should then be poped into R0.
+	instruction_add(POP, r0, NULL, 0, 0);
 
 	tracePrint ( "End RETURN_STATEMENT\n");
 }
