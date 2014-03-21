@@ -117,8 +117,10 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 	TEXT_DEBUG_FUNC_ARM();
 	TEXT_HEAD_ARM();
 	
-	// Loading some default values into the r registers to get deterministic
-	// output when programs have parameters in their first funciton.
+	/* Loading the default value of 1 into the r registers to get deterministic
+	 * output when programs have parameters in their first funciton.
+	*/
+	
 	instruction_add(MOVE32, STRDUP("#1"), r0, 0, 0);
 	instruction_add(MOVE32, STRDUP("#1"), r1, 0, 0);
 	instruction_add(MOVE32, STRDUP("#1"), r2, 0, 0);
@@ -126,6 +128,7 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 	instruction_add(MOVE32, STRDUP("#1"), r5, 0, 0);
 	instruction_add(MOVE32, STRDUP("#1"), r6, 0, 0);
 
+	// Add a call to the first function
 	node_t* program_function_list = root->children[root->n_children-1];
 	node_t* first_function = program_function_list->children[0];
 	instruction_add(CALL, STRDUP(first_function->label), NULL, 0, 0);
@@ -262,8 +265,6 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 	switch(root->expression_type.index){
 
 		case FUNC_CALL_E:
-			// Generate all children
-			//gen_default(root, scopedepth+1);//RECUR();
 			// push arguments to the stack
 			if(root->children[1]!=NULL) {	
 				for(int i=0;i<root->children[1]->n_children;i++) {
