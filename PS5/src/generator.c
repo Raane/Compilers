@@ -269,7 +269,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
 			
 			for(int i=0;i<root->n_children;i++) {
-				char string[11]; // 11 chars will fit .STRING plus any 32 bit number
+				char string[2]; // 2 chars will fit r plus any one digit number
 				sprintf(string, "r%d", i);
 				instruction_add(PUSH, string, NULL, 0, 0);
 			}
@@ -320,8 +320,6 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 			break;
 	}
 
-        //instruction_add(LOAD, r1, fp, 0, root->entry->stack_offset);
-	//instruction_add(MOVE32, STRDUP(".STRING0"), r0, 0, 0);
         instruction_add(PUSH, r0, NULL, 0, 0);	
 
 
