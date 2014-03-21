@@ -117,18 +117,18 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 	TEXT_DEBUG_FUNC_ARM();
 	TEXT_HEAD_ARM();
 	
-//	node_t* program_function_list = root->children[root->n_children-1];
-//	node_t* first_function = program_function_list->children[0];
-//	instruction_add(CALL, STRDUP(first_function->label), NULL, 0, 0);
+	// Loading some default values into the r registers to get deterministic
+	// output when programs have parameters in their first funciton.
+	instruction_add(MOVE32, STRDUP("#1"), r0, 0, 0);
+	instruction_add(MOVE32, STRDUP("#1"), r1, 0, 0);
+	instruction_add(MOVE32, STRDUP("#1"), r2, 0, 0);
+	instruction_add(MOVE32, STRDUP("#1"), r3, 0, 0);
+	instruction_add(MOVE32, STRDUP("#1"), r5, 0, 0);
+	instruction_add(MOVE32, STRDUP("#1"), r6, 0, 0);
 
-	/* TODO: Insert a call to the first defined function here */
 	node_t* program_function_list = root->children[root->n_children-1];
 	node_t* first_function = program_function_list->children[0];
 	instruction_add(CALL, STRDUP(first_function->label), NULL, 0, 0);
-	/*for ( int i=1; i<root->n_children; i++ )
-		if( root->children[i] != NULL )
-			root->children[i]->generate ( root->children[i], scopedepth );
-*/
 
 	tracePrint("End PROGRAM\n");
 
@@ -154,13 +154,9 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
 	instruction_add(PUSH, lr, NULL, 0, 0);
 	instruction_add(PUSH, fp, NULL, 0, 0);
 	instruction_add(MOVE, fp, sp, 0, 0);
-//
-//	/* Execute all code in the function */
-	gen_default(root, scopedepth+1);//RECUR();
-//	for ( int i=0; i<root->n_children; i++ )
-//		if( root->children[i] != NULL )
-//			root->children[i]->generate ( root->children[i], scopedepth );
 
+	/* Execute all code in the function */
+	gen_default(root, scopedepth+1);//RECUR();
 
 	/* Restore data related to the return after this function */
 	instruction_add(MOVE, sp, fp, 0, 0);
@@ -294,10 +290,12 @@ void gen_VARIABLE ( node_t *root, int scopedepth )
 {
 
 	tracePrint ( "Starting VARIABLE\n");
-
+	
 	int node_stack_offset = root->entry->stack_offset;
 	char variable_register[2];
+	// Calculate the correct register for the variable
 	sprintf(variable_register, "r%d", (node_stack_offset/4)-1); 
+	// Add the load instruction
 	instruction_add(LOAD, STRDUP(variable_register), fp, 0, node_stack_offset);
 
 
@@ -310,6 +308,7 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 	base_data_type_t t = root->data_type.base_type;
 	// Prepare a string to store the constant
 	char string[17]; // 17 chars will fit .STRING plus any 32 bit number
+	// Switch to prepare the correct string for the move operation
 	switch( t ) {
 		case INT_TYPE:
 			sprintf(string, "#%d", root->int_const);
@@ -324,6 +323,7 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 			sprintf(string, "#%d", root->int_const);
 			break;
 	}
+	// Add the instruction with the string from the switch
 	instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 
         instruction_add(PUSH, r0, NULL, 0, 0);	
