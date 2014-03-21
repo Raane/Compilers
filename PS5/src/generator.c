@@ -285,13 +285,6 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
 
 
-
-
-
-
-
-
-
 void gen_VARIABLE ( node_t *root, int scopedepth )
 {
 
@@ -310,7 +303,7 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 	switch( t ) {
 		case INT_TYPE:
 			// TODO: Remove hardcoding here
-			sprintf(string, "#%d", 22);
+			sprintf(string, "#%d", root->int_const);
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case STRING_TYPE:
