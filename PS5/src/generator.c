@@ -267,7 +267,14 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
 		case FUNC_CALL_E:
 
-
+			
+			for(int i=0;i<root->n_children;i++) {
+				char string[11]; // 11 chars will fit .STRING plus any 32 bit number
+				sprintf(string, "r%d", i);
+				instruction_add(PUSH, string, NULL, 0, 0);
+			}
+			instruction_add(CALL, STRDUP(root->function_entry->label), NULL, 0, 0);
+			instruction_add(POP, r0, NULL, 0, 0);
 
 		default:
 			break;
@@ -302,6 +309,7 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 	char string[17]; // 17 chars will fit .STRING plus any 32 bit number
 	switch( t ) {
 		case INT_TYPE:
+			// TODO: Remove hardcoding here
 			sprintf(string, "#%d", 22);
 			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
