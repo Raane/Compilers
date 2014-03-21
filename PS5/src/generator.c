@@ -308,26 +308,23 @@ void gen_CONSTANT (node_t * root, int scopedepth)
 {
 	tracePrint("Starting CONSTANT\n");
 	base_data_type_t t = root->data_type.base_type;
+	// Prepare a string to store the constant
 	char string[17]; // 17 chars will fit .STRING plus any 32 bit number
 	switch( t ) {
 		case INT_TYPE:
-			// TODO: Remove hardcoding here
 			sprintf(string, "#%d", root->int_const);
-			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case STRING_TYPE:
 			sprintf(string, "\\.STRING%d", root->string_index);
-			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		case BOOL_TYPE: 	
 			sprintf(string, "#%d", root->bool_const?1:0);
-			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 		default:
 			sprintf(string, "#%d", root->int_const);
-			instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 			break;
 	}
+	instruction_add(MOVE32, STRDUP(string), r0, 0, 0);
 
         instruction_add(PUSH, r0, NULL, 0, 0);	
 
@@ -341,10 +338,12 @@ void gen_ASSIGNMENT_STATEMENT ( node_t *root, int scopedepth )
 
 	tracePrint ( "Starting ASSIGNMENT_STATEMENT\n");
 
-
+	// Generate all children
 	gen_default(root, scopedepth);//RECUR();
 	int left_hand_side_variable_offset = root->children[0]->entry->stack_offset;
+	// Pop the return value of the right hand side into r0
 	instruction_add(POP, r0, NULL, 0, 0);
+	// Store the value from r0 in the variables position on the stack
 	instruction_add(STORE, fp, r0, left_hand_side_variable_offset, 0);	
 
 	tracePrint ( "End ASSIGNMENT_STATEMENT\n");
