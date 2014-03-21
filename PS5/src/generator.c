@@ -266,7 +266,9 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 	switch(root->expression_type.index){
 
 		case FUNC_CALL_E:
-
+			// Generate all children
+			//gen_default(root, scopedepth+1);//RECUR();
+			// push arguments to the stack
 			if(root->children[1]!=NULL) {	
 				for(int i=0;i<root->children[1]->n_children;i++) {
 					char string[2]; // 2 chars will fit r plus any one digit number
@@ -274,7 +276,9 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 					instruction_add(PUSH, STRDUP(string), NULL, 0, 0);
 				}
 			}
+			// Go to the function label
 			instruction_add(CALL, STRDUP(root->function_entry->label), NULL, 0, 0);
+			// Fetch return value
 			instruction_add(POP, r0, NULL, 0, 0);
 
 		default:
@@ -292,7 +296,9 @@ void gen_VARIABLE ( node_t *root, int scopedepth )
 	tracePrint ( "Starting VARIABLE\n");
 
 	int node_stack_offset = root->entry->stack_offset;
-	//instruction_add(LOAD, rx, fp, 0, node_stack_offset);
+	char variable_register[2];
+	sprintf(variable_register, "r%d", (node_stack_offset/4)-1); 
+	instruction_add(LOAD, STRDUP(variable_register), fp, 0, node_stack_offset);
 
 
 	tracePrint ( "End VARIABLE %s, stack offset: %d\n", root->label, root->entry->stack_offset);
