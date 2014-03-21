@@ -342,8 +342,10 @@ void gen_ASSIGNMENT_STATEMENT ( node_t *root, int scopedepth )
 	tracePrint ( "Starting ASSIGNMENT_STATEMENT\n");
 
 
-
-
+	gen_default(root, scopedepth);//RECUR();
+	int left_hand_side_variable_offset = root->children[0]->entry->stack_offset;
+	instruction_add(POP, r0, NULL, 0, 0);
+	instruction_add(STORE, fp, r0, left_hand_side_variable_offset, 0);	
 
 	tracePrint ( "End ASSIGNMENT_STATEMENT\n");
 }
