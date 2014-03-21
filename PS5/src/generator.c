@@ -271,7 +271,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			for(int i=0;i<root->n_children;i++) {
 				char string[2]; // 2 chars will fit r plus any one digit number
 				sprintf(string, "r%d", i);
-				instruction_add(PUSH, string, NULL, 0, 0);
+				instruction_add(PUSH, STRDUP(string), NULL, 0, 0);
 			}
 			instruction_add(CALL, STRDUP(root->function_entry->label), NULL, 0, 0);
 			instruction_add(POP, r0, NULL, 0, 0);
@@ -290,6 +290,8 @@ void gen_VARIABLE ( node_t *root, int scopedepth )
 
 	tracePrint ( "Starting VARIABLE\n");
 
+	int node_stack_offset = root->entry->stack_offset;
+	//instruction_add(LOAD, rx, fp, 0, node_stack_offset);
 
 
 	tracePrint ( "End VARIABLE %s, stack offset: %d\n", root->label, root->entry->stack_offset);
