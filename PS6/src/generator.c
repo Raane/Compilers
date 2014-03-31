@@ -284,7 +284,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
                     break;
 
                 case DIV_E:
-                    instruction_add3(DIV, r0, r1, r2); //TODO: Replace with SDIV when having confirmed that SDIV indeed was missing OR confirming that sdiv exists in ARM instruction set
+                    instruction_add3(DIV, r0, r1, r2); 
                     break;
 
                     // Comparison expressions:
@@ -334,7 +334,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 		case CLASS_FIELD_E:
 			// Fetching address value from child 1, pushing to top of stack:
 			root->children[0]->generate(root->children[0], scopedepth);
-			// Now poping from stack into r0:
+			// Now poping from stack into r1:
 	        instruction_add(POP, r1, NULL, 0,0);
 			// Now loading from heap, based on address from child 1 and offset from child 2:
 			instruction_add(LOAD, r0, r1, 0, root->children[1]->entry->stack_offset);
@@ -344,8 +344,8 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			break;
 		
 			
-		case THIS_E: //TODO: Double check that this works
-			instruction_add(MOVE, r0, "#8", 0, 0);
+		case THIS_E: //TODO: Double check that this works, double check that the value at class position in stack indeed is the address, or if it needs to be fetched using node field
+			instruction_add(MOVE, r0, fp, 0, 8);
 			instruction_add(PUSH, r0, NULL, 0, 0);
 			break;
 				
@@ -379,12 +379,13 @@ void gen_ASSIGNMENT_STATEMENT ( node_t *root, int scopedepth )
     if(root->children[0]->expression_type.index == CLASS_FIELD_E){
 		// Fetching address value from child 1, pushing to top of stack:
 		root->children[0]->children[0]->generate(root->children[0]->children[0], scopedepth);
-		// Now poping from stack into r0:
-        instruction_add(POP, r1, NULL, 0,0);
+		// Now popping THIS (a.k.a. the objects address value) from stack into r2:
+        instruction_add(POP, r2, NULL, 0,0);
+		// Now popping result from expression into r1:
+		instruction_add(POP, r1, NULL, 0,0);
 		// Now storing to the address on the heap, based on address from child 1 and offset from child 2:
-		instruction_add(STORE, r0, r1, 0, root->children[0]->children[1]->entry->stack_offset);
+		instruction_add(STORE, r1, r2, 0, root->children[0]->children[1]->entry->stack_offset);
 		// Pushing class field access result to stac:
-		//instruction_add(PUSH, r0, NULL, 0,0); //TODO: Concider, then keep or delete
     }
     // or a variable, handled in previous assignment
     else{
