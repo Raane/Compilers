@@ -227,6 +227,8 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
      */
     tracePrint ( "Starting EXPRESSION of type %s\n", (char*) root->expression_type.text);
 
+    int size;
+    char size_string[100];
     switch(root->expression_type.index){
 
         // Binary expressions:
@@ -314,6 +316,20 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
         case FUNC_CALL_E:
             ge(root,scopedepth);
             break;
+
+        case NEW_E:
+            size = root->class_entry->size;
+            size = root->int_const;
+            snprintf(size_string, 100, "#%d", size); //Max 99 digits
+
+            instruction_add(MOVE, r0, STRDUP(size_string), 0, 0);
+            instruction_add(PUSH, r0, NULL, 0, 0); //Pushing constant to stack, in case of print statement
+
+            instruction_add(CALL, "malloc", NULL, 0, 0);
+            instruction_add(PUSH, r0, NULL, 0, 0);
+
+            break;
+
 
             /* Add cases for other expressions here */
     }
