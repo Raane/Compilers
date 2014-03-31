@@ -122,6 +122,19 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 void gen_CLASS (node_t *root, int scopedepth)
 {
 
+    // Skipping first child, assembly only for methods are necessary
+    // Going through the functions in the function list, creating the methods:
+
+    // Second child is the function list of the class
+    //currentClass = (char*) malloc (sizeof(char));
+    int i;
+    for(i=0; i<root->children[1]->n_children; i++){
+        currentClass=root->label;
+        root->children[1]->children[i]->generate(root->children[1]->children[i], scopedepth);
+    }
+    //free(currentClass);
+    currentClass = NULL;
+
 }
 
 void gen_FUNCTION ( node_t *root, int scopedepth )
@@ -131,6 +144,13 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
     int len = strlen(entry->label);
     char *temp = (char*) malloc(sizeof(char) * (len + 3));
     temp[0] = 0;
+
+    //New code for handling labels for classes:
+    if (currentClass!=NULL){
+        strcat(temp, "_");
+        strcat(temp, currentClass);
+    }
+
     strcat(temp, "_");
     strcat(temp, entry->label);
     strcat(temp, ":");
@@ -231,7 +251,13 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
     char size_string[100];
     switch(root->expression_type.index){
 
-        // Binary expressions:
+        case FUNC_CALL_E:
+            ge(root,scopedepth);
+            break;
+
+            /* Add cases for other expressions here */
+
+            // Binary expressions:
         case ADD_E: case SUB_E: case MUL_E: case DIV_E: case AND_E: case OR_E:
         case EQUAL_E: case NEQUAL_E: case LEQUAL_E: case GEQUAL_E: case LESS_E: case GREATER_E:
 
@@ -281,34 +307,45 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVEQ, r0, "#1", 0,0);
-                    //TODO: Not working, must fix
                     break;
 
                 case NEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVNE, r0, "#1", 0,0);
-                    //TODO: Not working, must fix
                     break;
 
                 case GEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVGE, r0, "#1", 0,0); 
-                    //TODO: Not working, must fix
-
                     break;
 
                 case LEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVLE, r0, "#1", 0,0);
-                    //TODO: Not working, must fix
                     break;
 
             }
             // Pushing to stack:
             instruction_add(PUSH, r0, NULL, 0, 0);
+
+            break;	
+
+        case CLASS_FIELD_E:
+            // Fetching address value from child 1, pushing to top of stack:
+            root->children[0]->generate(root->children[0], scopedepth);
+            // Now poping from stack into r0:
+            instruction_add(POP, r1, NULL, 0,0);
+            // Now loading from heap, based on address from child 1 and offset from child 2:
+            instruction_add(LOAD, r0, r1, 0, root->children[1]->entry->stack_offset);
+            // Pushing class field access result to stac:
+            instruction_add(PUSH, r0, NULL, 0,0);
+
+            break;
+
+
 
             break;	
 
