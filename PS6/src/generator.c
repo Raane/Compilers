@@ -122,6 +122,19 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 void gen_CLASS (node_t *root, int scopedepth)
 {
 
+	// Skipping first child, assembly only for methods are necessary
+	// Going through the functions in the function list, creating the methods:
+	
+	// Second child is the function list of the class
+	//currentClass = (char*) malloc (sizeof(char));
+	int i;
+	for(i=0; i<root->children[1]->n_children; i++){
+		currentClass=root->label;
+		root->children[1]->children[i]->generate(root->children[1]->children[i], scopedepth);
+	}
+	//free(currentClass);
+	currentClass = NULL;
+
 }
 
 void gen_FUNCTION ( node_t *root, int scopedepth )
@@ -131,6 +144,13 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
     int len = strlen(entry->label);
     char *temp = (char*) malloc(sizeof(char) * (len + 3));
     temp[0] = 0;
+	
+	//New code for handling labels for classes:
+	if (currentClass!=NULL){
+	    strcat(temp, "_");
+	    strcat(temp, currentClass);
+	}
+	
     strcat(temp, "_");
     strcat(temp, entry->label);
     strcat(temp, ":");
