@@ -331,7 +331,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
             // Pushing to stack:
             instruction_add(PUSH, r0, NULL, 0, 0);
 
-            break;	
+            break;
 
         case CLASS_FIELD_E:
             // Fetching address value from child 1, pushing to top of stack:
@@ -345,6 +345,10 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
             break;
 
+        case THIS_E: //TODO: Double check that this works
+            instruction_add(MOVE, r0, "#8", 0, 0);
+            instruction_add(PUSH, r0, NULL, 0, 0);
+            break;
 
         case NEW_E:
             size = root->children[0]->class_entry->size;
@@ -386,7 +390,14 @@ void gen_ASSIGNMENT_STATEMENT ( node_t *root, int scopedepth )
 
     // Left hand side may be a class field, which should be handled in this assignment
     if(root->children[0]->expression_type.index == CLASS_FIELD_E){
-
+        // Fetching address value from child 1, pushing to top of stack:
+        root->children[0]->children[0]->generate(root->children[0]->children[0], scopedepth);
+        // Now poping from stack into r0:
+        instruction_add(POP, r1, NULL, 0,0);
+        // Now storing to the address on the heap, based on address from child 1 and offset from child 2:
+        instruction_add(STORE, r0, r1, 0, root->children[0]->children[1]->entry->stack_offset);
+        // Pushing class field access result to stac:
+        //instruction_add(PUSH, r0, NULL, 0,0); //TODO: Concider, then keep or delete
     }
     // or a variable, handled in previous assignment
     else{
