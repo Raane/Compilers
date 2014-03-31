@@ -249,19 +249,25 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
     switch(root->expression_type.index){
 
-        // Binary expressions:
-        case ADD_E: case SUB_E: case MUL_E: case DIV_E: case AND_E: case OR_E:
-        case EQUAL_E: case NEQUAL_E: case LEQUAL_E: case GEQUAL_E: case LESS_E: case GREATER_E:
+        case FUNC_CALL_E:
+            ge(root,scopedepth);
+            break;
 
-            // The two operands are in the two child-nodes. They must be generated.
-            root->children[0]->generate(root->children[0], scopedepth);
-            root->children[1]->generate(root->children[1], scopedepth);
-            // Fetching the operands from stack
-            instruction_add(POP, r2, NULL, 0,0);
-            instruction_add(POP, r1, NULL, 0,0);
-            // Calculating, and pushing to stack
+            /* Add cases for other expressions here */
+			
+	        // Binary expressions:
+	   	case ADD_E: case SUB_E: case MUL_E: case DIV_E: case AND_E: case OR_E:
+		case EQUAL_E: case NEQUAL_E: case LEQUAL_E: case GEQUAL_E: case LESS_E: case GREATER_E:
 
-            // Now the current operation itself:
+	        // The two operands are in the two child-nodes. They must be generated.
+	        root->children[0]->generate(root->children[0], scopedepth);
+	        root->children[1]->generate(root->children[1], scopedepth);
+	        // Fetching the operands from stack
+	        instruction_add(POP, r2, NULL, 0,0);
+	        instruction_add(POP, r1, NULL, 0,0);
+			// Calculating, and pushing to stack
+
+	        // Now the current operation itself:
             switch(root->expression_type.index){
 
                 // Arithmetic and logical expressions:
@@ -288,7 +294,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVGT, r0, "#1", 0,0);
                     break;
-
+	
                 case LESS_E: 
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
@@ -299,43 +305,46 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVEQ, r0, "#1", 0,0);
-                    //TODO: Not working, must fix
                     break;
 
                 case NEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVNE, r0, "#1", 0,0);
-                    //TODO: Not working, must fix
                     break;
 
                 case GEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVGE, r0, "#1", 0,0); 
-                    //TODO: Not working, must fix
-
                     break;
 
                 case LEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVLE, r0, "#1", 0,0);
-                    //TODO: Not working, must fix
                     break;
 
             }
-            // Pushing to stack:
-            instruction_add(PUSH, r0, NULL, 0, 0);
+	            // Pushing to stack:
+	        instruction_add(PUSH, r0, NULL, 0, 0);
 
-            break;	
+	        break;	
+				
+		case CLASS_FIELD_E:
+			// Fetching address value from child 1, pushing to top of stack:
+			root->children[0]->generate(root->children[0], scopedepth);
+			// Now poping from stack into r0:
+	        instruction_add(POP, r1, NULL, 0,0);
+			// Now loading from heap, based on address from child 1 and offset from child 2:
+			instruction_add(LOAD, r0, r1, 0, root->children[1]->entry->stack_offset);
+			// Pushing class field access result to stac:
+			instruction_add(PUSH, r0, NULL, 0,0);
+			
+			break;
+			
+				
 
-
-        case FUNC_CALL_E:
-            ge(root,scopedepth);
-            break;
-
-            /* Add cases for other expressions here */
     }
 
     tracePrint ( "Ending EXPRESSION of type %s\n", (char*) root->expression_type.text);
