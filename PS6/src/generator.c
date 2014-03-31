@@ -158,6 +158,7 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
 	instruction_add(STRING, STRDUP(temp), NULL, 0, 0);
 
 	gf(root,scopedepth);
+	free(temp);
 }
 
 
@@ -256,6 +257,77 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			break;
 
 			/* Add cases for other expressions here */
+		case METH_CALL_E:
+			// Caller saves registers on stack.
+			// Assuming that there might be something in registers r1-r3
+			// Assuming that r0 are used to handle different inputs and outputs, including function result.
+			instruction_add(PUSH, r3, NULL, 0,0);
+			instruction_add(PUSH, r2, NULL, 0,0);
+			instruction_add(PUSH, r1, NULL, 0,0);
+		
+			// Caller pushes parameters on stack.
+			// Must find number of parameters, and push each value to stack
+			// When parameters, second child-node is a variable-list instead of NULL. Children of that node contain the parameters values
+			int i;
+			char* input;
+			if (root->children[2]!=NULL){
+			
+				for (i=0; i<root->children[2]->n_children; i++){
+					// Load parameter number i into register r0 by using the generate-method for that node (usually variable or constant)
+					// r0 will automatically be pushed by either gen_CONSTANT or gen_VARIABLE
+					root->children[2]->children[i]->generate(root->children[2]->children[i], scopedepth);
+				
+				}
+			}
+			
+			// IMPORTANT: Difference from func_call is also that the object (value is address on heap) is pushed as final argument
+			// Loading object as variable into r0 and pushing r0 in stack, by generate
+			//root->children[0]->children[i]->generate(root->children[0]->children[i], scopedepth);
+			
+			//Performing method call from correct class:
+			//function_symbol_t* entry = root->children[1]->function_entry;
+			symbol_t* p1 = root->children[0]->entry;
+			data_type_t p2 = p1->type;
+			int len2 = strlen(p2.class_name);
+			
+			char *temp2 = (char*) malloc(sizeof(char) * (len2 + 3));
+			temp2[0] = 0;
+			strcat(temp2, "_");
+			//temp3 = test.type->class_name;
+			//temp3= root->children[0]->entry.type->class_name;
+			strcat(temp2, p2.class_name);
+			strcat(temp2, "_");
+			strcat(temp2, root->children[1]->label);
+			strcat(temp2, ":");
+
+			instruction_add(CALL, STRDUP(temp2), NULL, 0, 0 );
+			free(temp2);
+			
+			// Callee jumps back to caller, and pops return address. Caller removes parameters, restores registers, uses result.
+			// Using r0 for result storing from the function
+			if (root->children[2]!=NULL){
+			
+				for (i=0; i<root->children[2]->n_children; i++){
+					// Poping parameters from stack, by loading into r8, that is otherwise never used.
+					instruction_add(POP, "r8", NULL, 0,0);
+				}
+			}
+			
+			// Restoring original registers
+			instruction_add(POP, r1, NULL, 0,0);
+			instruction_add(POP, r2, NULL, 0,0);
+			instruction_add(POP, r3, NULL, 0,0);
+		
+			// NOTE: Have to hack in order to make sure printing works when including functions straight in print statement
+			// by setting data_type
+			root->data_type = root->function_entry->return_type;
+			if (root->data_type.base_type!=VOID_TYPE){
+				// Adding result in r0 to stack as return result
+				instruction_add(PUSH, r0, NULL, 0,0);
+			}
+			
+			
+			break;
 
 			// Binary expressions:
 		case ADD_E: case SUB_E: case MUL_E: case DIV_E: case AND_E: case OR_E:
@@ -348,7 +420,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			break;
 
 		case THIS_E: //TODO: Double check that this works, double check that the value at class position in stack indeed is the address, or if it needs to be fetched using node field
-			instruction_add(MOVE, r0, fp, 0, 8);
+			instruction_add(LOAD, r0, fp, 0, 8);
 			instruction_add(PUSH, r0, NULL, 0, 0);
 			break;
 
@@ -360,7 +432,8 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			instruction_add(PUSH, r0, NULL, 0, 0); //Pushing constant to stack, in case of print statement
 
 			instruction_add(CALL, "malloc", NULL, 0, 0);
-			instruction_add(PUSH, r0, NULL, 0, 0);
+			instruction_add(STORE, r0, sp, 0, 8);
+			//instruction_add(PUSH, r0, NULL, 0, 0);
 			break;
 	}
 
