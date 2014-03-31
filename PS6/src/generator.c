@@ -122,18 +122,18 @@ void gen_PROGRAM ( node_t *root, int scopedepth)
 void gen_CLASS (node_t *root, int scopedepth)
 {
 
-	// Skipping first child, assembly only for methods are necessary
-	// Going through the functions in the function list, creating the methods:
-	
-	// Second child is the function list of the class
-	//currentClass = (char*) malloc (sizeof(char));
-	int i;
-	for(i=0; i<root->children[1]->n_children; i++){
-		currentClass=root->label;
-		root->children[1]->children[i]->generate(root->children[1]->children[i], scopedepth);
-	}
-	//free(currentClass);
-	currentClass = NULL;
+    // Skipping first child, assembly only for methods are necessary
+    // Going through the functions in the function list, creating the methods:
+
+    // Second child is the function list of the class
+    //currentClass = (char*) malloc (sizeof(char));
+    int i;
+    for(i=0; i<root->children[1]->n_children; i++){
+        currentClass=root->label;
+        root->children[1]->children[i]->generate(root->children[1]->children[i], scopedepth);
+    }
+    //free(currentClass);
+    currentClass = NULL;
 
 }
 
@@ -144,13 +144,13 @@ void gen_FUNCTION ( node_t *root, int scopedepth )
     int len = strlen(entry->label);
     char *temp = (char*) malloc(sizeof(char) * (len + 3));
     temp[0] = 0;
-	
-	//New code for handling labels for classes:
-	if (currentClass!=NULL){
-	    strcat(temp, "_");
-	    strcat(temp, currentClass);
-	}
-	
+
+    //New code for handling labels for classes:
+    if (currentClass!=NULL){
+        strcat(temp, "_");
+        strcat(temp, currentClass);
+    }
+
     strcat(temp, "_");
     strcat(temp, entry->label);
     strcat(temp, ":");
@@ -247,6 +247,8 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
      */
     tracePrint ( "Starting EXPRESSION of type %s\n", (char*) root->expression_type.text);
 
+    int size;
+    char size_string[100];
     switch(root->expression_type.index){
 
         case FUNC_CALL_E:
@@ -254,20 +256,20 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
             break;
 
             /* Add cases for other expressions here */
-			
-	        // Binary expressions:
-	   	case ADD_E: case SUB_E: case MUL_E: case DIV_E: case AND_E: case OR_E:
-		case EQUAL_E: case NEQUAL_E: case LEQUAL_E: case GEQUAL_E: case LESS_E: case GREATER_E:
 
-	        // The two operands are in the two child-nodes. They must be generated.
-	        root->children[0]->generate(root->children[0], scopedepth);
-	        root->children[1]->generate(root->children[1], scopedepth);
-	        // Fetching the operands from stack
-	        instruction_add(POP, r2, NULL, 0,0);
-	        instruction_add(POP, r1, NULL, 0,0);
-			// Calculating, and pushing to stack
+            // Binary expressions:
+        case ADD_E: case SUB_E: case MUL_E: case DIV_E: case AND_E: case OR_E:
+        case EQUAL_E: case NEQUAL_E: case LEQUAL_E: case GEQUAL_E: case LESS_E: case GREATER_E:
 
-	        // Now the current operation itself:
+            // The two operands are in the two child-nodes. They must be generated.
+            root->children[0]->generate(root->children[0], scopedepth);
+            root->children[1]->generate(root->children[1], scopedepth);
+            // Fetching the operands from stack
+            instruction_add(POP, r2, NULL, 0,0);
+            instruction_add(POP, r1, NULL, 0,0);
+            // Calculating, and pushing to stack
+
+            // Now the current operation itself:
             switch(root->expression_type.index){
 
                 // Arithmetic and logical expressions:
@@ -294,7 +296,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
                     instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVGT, r0, "#1", 0,0);
                     break;
-	
+
                 case LESS_E: 
                     instruction_add(MOVE, r0, "#0", 0,0);
                     instruction_add(CMP, r1, r2, 0,0);
@@ -326,30 +328,40 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
                     break;
 
             }
-	            // Pushing to stack:
-	        instruction_add(PUSH, r0, NULL, 0, 0);
 
-	        break;	
-				
-		case CLASS_FIELD_E:
-			// Fetching address value from child 1, pushing to top of stack:
-			root->children[0]->generate(root->children[0], scopedepth);
-			// Now poping from stack into r1:
-	        instruction_add(POP, r1, NULL, 0,0);
-			// Now loading from heap, based on address from child 1 and offset from child 2:
-			instruction_add(LOAD, r0, r1, 0, root->children[1]->entry->stack_offset);
-			// Pushing class field access result to stac:
-			instruction_add(PUSH, r0, NULL, 0,0);
-			
-			break;
-		
-			
-		case THIS_E: //TODO: Double check that this works, double check that the value at class position in stack indeed is the address, or if it needs to be fetched using node field
-			instruction_add(MOVE, r0, fp, 0, 8);
-			instruction_add(PUSH, r0, NULL, 0, 0);
-			break;
-				
+            // Pushing to stack:
+            instruction_add(PUSH, r0, NULL, 0, 0);
 
+            break;
+
+        case CLASS_FIELD_E:
+            // Fetching address value from child 1, pushing to top of stack:
+            root->children[0]->generate(root->children[0], scopedepth);
+            // Now poping from stack into r0:
+            instruction_add(POP, r1, NULL, 0,0);
+            // Now loading from heap, based on address from child 1 and offset from child 2:
+            instruction_add(LOAD, r0, r1, 0, root->children[1]->entry->stack_offset);
+            // Pushing class field access result to stac:
+            instruction_add(PUSH, r0, NULL, 0,0);
+
+
+            break;
+
+        case THIS_E: //TODO: Double check that this works, double check that the value at class position in stack indeed is the address, or if it needs to be fetched using node field
+            instruction_add(MOVE, r0, fp, 0, 8);
+            instruction_add(PUSH, r0, NULL, 0, 0);
+            break;
+
+        case NEW_E:
+            size = root->children[0]->class_entry->size;
+            snprintf(size_string, 100, "#%d", size); //Max 99 digits
+
+            instruction_add(MOVE, r0, STRDUP(size_string), 0, 0);
+            instruction_add(PUSH, r0, NULL, 0, 0); //Pushing constant to stack, in case of print statement
+
+            instruction_add(CALL, "malloc", NULL, 0, 0);
+            instruction_add(PUSH, r0, NULL, 0, 0);
+            break;
     }
 
     tracePrint ( "Ending EXPRESSION of type %s\n", (char*) root->expression_type.text);
@@ -377,6 +389,7 @@ void gen_ASSIGNMENT_STATEMENT ( node_t *root, int scopedepth )
 
     // Left hand side may be a class field, which should be handled in this assignment
     if(root->children[0]->expression_type.index == CLASS_FIELD_E){
+<<<<<<< HEAD
 		// Fetching address value from child 1, pushing to top of stack:
 		root->children[0]->children[0]->generate(root->children[0]->children[0], scopedepth);
 		// Now popping THIS (a.k.a. the objects address value) from stack into r2:
@@ -386,6 +399,16 @@ void gen_ASSIGNMENT_STATEMENT ( node_t *root, int scopedepth )
 		// Now storing to the address on the heap, based on address from child 1 and offset from child 2:
 		instruction_add(STORE, r1, r2, 0, root->children[0]->children[1]->entry->stack_offset);
 		// Pushing class field access result to stac:
+=======
+        // Fetching address value from child 1, pushing to top of stack:
+        root->children[0]->children[0]->generate(root->children[0]->children[0], scopedepth);
+        // Now poping from stack into r0:
+        instruction_add(POP, r1, NULL, 0,0);
+        // Now storing to the address on the heap, based on address from child 1 and offset from child 2:
+        instruction_add(STORE, r0, r1, 0, root->children[0]->children[1]->entry->stack_offset);
+        // Pushing class field access result to stac:
+        //instruction_add(PUSH, r0, NULL, 0,0); //TODO: Concider, then keep or delete
+>>>>>>> e92d5f77425ff2024f94ed98b5ce1867294d4642
     }
     // or a variable, handled in previous assignment
     else{
