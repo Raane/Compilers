@@ -299,7 +299,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
                 case LEQUAL_E:
                     instruction_add(MOVE, r0, "#0", 0,0);
-                    instruction_add(CMP, r2, r1, 0,0);
+                    instruction_add(CMP, r1, r2, 0,0);
                     instruction_add(MOVLE, r0, "#1", 0,0);
                     //TODO: Not working, must fix
                     break;
