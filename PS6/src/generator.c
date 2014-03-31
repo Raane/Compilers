@@ -346,17 +346,8 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
             break;
 
 
-
-            break;	
-
-
-        case FUNC_CALL_E:
-            ge(root,scopedepth);
-            break;
-
         case NEW_E:
-            size = root->class_entry->size;
-            size = root->int_const;
+            size = root->children[0]->class_entry->size;
             snprintf(size_string, 100, "#%d", size); //Max 99 digits
 
             instruction_add(MOVE, r0, STRDUP(size_string), 0, 0);
@@ -364,7 +355,6 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 
             instruction_add(CALL, "malloc", NULL, 0, 0);
             instruction_add(PUSH, r0, NULL, 0, 0);
-
             break;
 
 
