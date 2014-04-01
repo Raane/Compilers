@@ -487,9 +487,29 @@ void gen_RETURN_STATEMENT ( node_t *root, int scopedepth )
 void gen_WHILE_STATEMENT ( node_t *root, int scopedepth )
 {
 	while_count ++;
-	char size_string[100];
-	snprintf(size_string, 100, "while%d", while_count); //Max 99 digits
-	instruction_add(LABEL, STRDUP(size_string), NULL, 0, 0);
+	char while_string[100];
+	snprintf(while_string, 100, "while%d", while_count); //Max 99 digits
+	char while_label[100];
+	snprintf(while_label, 100, "_while%d", while_count); //Max 99 digits
+	char while_end_string[100];
+	snprintf(while_end_string, 100, "while_end%d", while_count); //Max 99 digits
+	char while_end_label[100];
+	snprintf(while_end_label, 100, "_while_end%d", while_count); //Max 99 digits
+	instruction_add(LABEL, STRDUP(while_string), NULL, 0, 0);
+
+// Evaluate expression
+	gen_default(root->children[0], scopedepth+1);//RECUR();
+// Compare to zero
+  instruction_add(MOVE, "r8", "#0", 0, 0);
+	instruction_add(CMP, r0, "r8", 0, 0);
+// Jump is 0
+	instruction_add(JUMPNE, STRDUP(while_end_label), NULL, 0, 0 );
+// body
+	gen_default(root->children[1], scopedepth+1);//RECUR();
+// Jump to start of loop
+	instruction_add(JUMP, STRDUP(while_label), NULL, 0, 0);
+
+	instruction_add(LABEL, STRDUP(while_end_string), NULL, 0, 0);
 }
 
 
@@ -510,7 +530,7 @@ void gen_IF_STATEMENT ( node_t *root, int scopedepth )
 	gen_default(root->children[0], scopedepth+1);//RECUR();
 
 	// Compare it to zero
-  instruction_add(MOVE, "r8", "#0", 0, 0);
+	instruction_add(MOVE, "r8", "#0", 0, 0);
 	instruction_add(CMP, r0, "r8", 0, 0);
   // Jump to label if zero
   if(have_else) {
