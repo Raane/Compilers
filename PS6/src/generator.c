@@ -487,16 +487,48 @@ void gen_RETURN_STATEMENT ( node_t *root, int scopedepth )
 void gen_WHILE_STATEMENT ( node_t *root, int scopedepth )
 {
 	while_count ++;
-	int while_count_for_this_while = while_count;
-	char* while_count_string = 
 	char size_string[100];
-	snprintf(size_string, 100, "#%d", size); //Max 99 digits
-	instruction_add(LABEL, STRDUP(), NULL, 0, 0);
+	snprintf(size_string, 100, "while%d", while_count); //Max 99 digits
+	instruction_add(LABEL, STRDUP(size_string), NULL, 0, 0);
 }
 
 
 void gen_IF_STATEMENT ( node_t *root, int scopedepth )
 {
+	while_count ++;
+	char else_sting[100];
+	snprintf(else_sting, 100, "else%d", if_count); //Max 99 digits
+	char else_sting_label[100];
+	snprintf(else_sting_label, 100, "_else%d", if_count); //Max 99 digits
+	char end_sting[100];
+	snprintf(end_sting, 100, "if_end%d", if_count); //Max 99 digits
+	char end_sting_label[100];
+	snprintf(end_sting_label, 100, "_if_end%d", if_count); //Max 99 digits
+	bool have_else = root->n_children==3;
+
+	// Evaluate the expression (this will place the value of the expression in r0)
+	gen_default(root->children[0], scopedepth+1);//RECUR();
+
+	// Compare it to zero
+  instruction_add(MOVE, "r8", "#0", 0, 0);
+	instruction_add(CMP, r0, "r8", 0, 0);
+  // Jump to label if zero
+  if(have_else) {
+		instruction_add(JUMPNE, STRDUP(else_sting_label), NULL, 0, 0 );
+	} else {
+		instruction_add(JUMPNE, STRDUP(end_sting_label), NULL, 0, 0 );
+	}
+  // Run the code from the body
+	gen_default(root->children[1], scopedepth+1);//RECUR();
+
+	
+	if(have_else) {
+		instruction_add(LABEL, STRDUP(end_sting), NULL, 0, 0);
+		gen_default(root->children[2], scopedepth+1);//RECUR();
+	}
+
+
+	instruction_add(LABEL, STRDUP(end_sting), NULL, 0, 0);
 
 }
 
