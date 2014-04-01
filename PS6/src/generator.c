@@ -414,7 +414,12 @@ void gen_RETURN_STATEMENT ( node_t *root, int scopedepth )
 
 void gen_WHILE_STATEMENT ( node_t *root, int scopedepth )
 {
-
+	while_count ++;
+	int while_count_for_this_while = while_count;
+	char* while_count_string = 
+	char size_string[100];
+	snprintf(size_string, 100, "#%d", size); //Max 99 digits
+	instruction_add(LABEL, STRDUP(), NULL, 0, 0);
 }
 
 
