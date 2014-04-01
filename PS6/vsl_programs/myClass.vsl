@@ -1,0 +1,129 @@
+CLASS testClass HAS
+
+	INT i;
+	INT f;
+
+	testClass tc1;
+
+WITH
+
+	VOID FUNC show ()
+	START
+		PRINT "Content: i: ", THIS.i, ", f: ", THIS.f;
+		PRINT "Content tc1: i: ", THIS.tc1.i, ", f: ", THIS.tc1.f;
+	END
+
+	VOID FUNC construct (INT i, INT f, testClass tc1)
+	START
+		THIS.i := i;
+		THIS.f := f;
+		THIS.tc1 := tc1;
+	END
+
+	testClass FUNC getThis ()
+	START
+		RETURN THIS;
+	END
+	
+	INT FUNC get_i ()
+	START
+		RETURN THIS.i;
+	END
+
+END
+
+CLASS tiny HAS
+
+	INT a;
+	
+WITH
+
+	VOID FUNC construct(INT a)
+	START
+		THIS.a:=a;
+	END
+	
+	VOID FUNC show()
+	START
+		PRINT "Content a: ", THIS.a;
+	END
+END
+
+CLASS topClass HAS
+
+	INT i;
+	INT f;
+
+	tiny tc1;
+
+WITH
+
+	VOID FUNC show ()
+	START
+		PRINT "Content: i: ", THIS.i, ", f: ", THIS.f;
+		PRINT "Content tc1: ";
+		THIS.tc1.show();
+	END
+
+	VOID FUNC construct (INT i, INT f, tiny tc1)
+	START
+		THIS.i := i;
+		THIS.f := f;
+		THIS.tc1 := tc1;
+	END
+
+	tiny FUNC getTiny ()
+	START
+		RETURN THIS.tc1;
+	END
+	
+	VOID FUNC setTiny (tiny h)
+	START
+		THIS.tc1 := h;
+	END
+		
+END
+
+VOID FUNC test() START
+	//hardClass h;
+	//hardClass h2;
+	testClass t;
+	tiny k24;
+	topClass p15;
+	
+	//h := NEW hardClass;
+	//h2 := NEW hardClass;
+	t := NEW testClass;
+	k24 := NEW tiny;
+	p15 := NEW topClass;
+	
+	t.construct(2, 325, t);
+	
+	PRINT "printing t";
+	t.show();
+	
+	k24.construct(123);
+	
+	PRINT "printing k24";
+	k24.show();
+	
+	p15.construct (7, 8, k24);
+	
+	PRINT "printing p15";
+	p15.show();
+	
+	tiny K4444;
+	K4444 := NEW tiny;
+	tiny al;
+	al := NEW tiny;
+	K4444.construct(999912);
+	al := p15.getTiny();
+	
+	p15.setTiny(K4444);
+	
+	PRINT "printing p15.tc1";
+	p15.tc1.show();
+	
+	PRINT "printing al";
+	al.show();
+END
