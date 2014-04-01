@@ -292,7 +292,6 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			
 			char *temp2 = (char*) malloc(sizeof(char) * (len2 + 3));
 			temp2[0] = 0;
-			strcat(temp2, "_");
 			//temp3 = test.type->class_name;
 			//temp3= root->children[0]->entry.type->class_name;
 			strcat(temp2, p2.class_name);
@@ -431,9 +430,10 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			instruction_add(MOVE, r0, STRDUP(size_string), 0, 0);
 			instruction_add(PUSH, r0, NULL, 0, 0); //Pushing constant to stack, in case of print statement
 
-			instruction_add(CALL, "malloc", NULL, 0, 0);
-			instruction_add(STORE, r0, sp, 0, 8);
-			//instruction_add(PUSH, r0, NULL, 0, 0);
+			instruction_add(CALL, STRDUP("malloc"), NULL, 0, 0);
+			instruction_add(POP, r1, NULL, 0, 0);
+			//instruction_add(STORE, r0, sp, 0, 8);
+			instruction_add(PUSH, r0, NULL, 0, 0);
 			break;
 	}
 
