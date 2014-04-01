@@ -76,7 +76,7 @@ void tracePrint( const char * string, ... )
 	if( outputStage == 10 )
 		fprintf(stderr, "%s", buff2);
 
-	instruction_add ( COMMMENT, STRDUP( buff2 ), NULL, 0, 0 );
+	//instruction_add ( COMMMENT, STRDUP( buff2 ), NULL, 0, 0 );
 }
 
 
@@ -269,7 +269,6 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			// Must find number of parameters, and push each value to stack
 			// When parameters, second child-node is a variable-list instead of NULL. Children of that node contain the parameters values
 			int i;
-			char* input;
 			if (root->children[2]!=NULL){
 			
 				for (i=0; i<root->children[2]->n_children; i++){
@@ -282,7 +281,7 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			
 			// IMPORTANT: Difference from func_call is also that the object (value is address on heap) is pushed as final argument
 			// Loading object as variable into r0 and pushing r0 in stack, by generate
-			//root->children[0]->children[i]->generate(root->children[0]->children[i], scopedepth);
+			root->children[0]->generate(root->children[0], scopedepth);
 			
 			//Performing method call from correct class:
 			//function_symbol_t* entry = root->children[1]->function_entry;
@@ -297,17 +296,17 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			strcat(temp2, p2.class_name);
 			strcat(temp2, "_");
 			strcat(temp2, root->children[1]->label);
-			strcat(temp2, ":");
 
 			instruction_add(CALL, STRDUP(temp2), NULL, 0, 0 );
 			free(temp2);
 			
+			// Poping THIS as argument from the stack
+			instruction_add(POP, "r8", NULL, 0,0); 
 			// Callee jumps back to caller, and pops return address. Caller removes parameters, restores registers, uses result.
 			// Using r0 for result storing from the function
 			if (root->children[2]!=NULL){
-			
 				for (i=0; i<root->children[2]->n_children; i++){
-					// Poping parameters from stack, by loading into r8, that is otherwise never used.
+					// Poping parameters from stack, by loading into r8, that is otherwise never used. This includes the objects heap parameter
 					instruction_add(POP, "r8", NULL, 0,0);
 				}
 			}
