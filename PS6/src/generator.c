@@ -257,6 +257,16 @@ void gen_EXPRESSION ( node_t *root, int scopedepth )
 			break;
 
 			/* Add cases for other expressions here */
+		case UMINUS_E:
+			// Generate the child
+			root->children[0]->generate(root->children[0], scopedepth);
+			// Fetching the operand from stack
+			instruction_add(POP, r0, NULL, 0, 0);
+			instruction_add(MOVE, r1, "#-1", 0, 0);
+			instruction_add3(MUL, r0, r0, r1);
+			instruction_add(PUSH, r0, NULL, 0, 0);
+			break;
+
 		case METH_CALL_E:
 			// Caller saves registers on stack.
 			// Assuming that there might be something in registers r1-r3
