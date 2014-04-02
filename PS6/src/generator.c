@@ -496,21 +496,21 @@ void gen_WHILE_STATEMENT ( node_t *root, int scopedepth )
 	char while_end_label[100];
 	snprintf(while_end_label, 100, "_while_end%d", while_count); //Max 99 digits
 	instruction_add(LABEL, STRDUP(while_string), NULL, 0, 0);
-
 // Evaluate expression
 	if( root->children[0] != NULL )
 		root->children[0]->generate ( root->children[0], scopedepth );
 // Compare to zero
-  	instruction_add(MOVE, "r8", "#0", 0, 0);
-	instruction_add(CMP, r0, "r8", 0, 0);
+	instruction_add(POP, r0, NULL, 0, 0);
+	instruction_add(CMP, r0, "#0", 0, 0);
 // Jump is 0
-	instruction_add(JUMPNE, STRDUP(while_end_label), NULL, 0, 0 );
+	instruction_add(JUMPZERO, STRDUP(while_end_label), NULL, 0, 0 );
 // body
 	if( root->children[1] != NULL )
 		root->children[1]->generate ( root->children[1], scopedepth );
 // Jump to start of loop
 	instruction_add(JUMP, STRDUP(while_label), NULL, 0, 0);
-
+/*
+*/
 	instruction_add(LABEL, STRDUP(while_end_string), NULL, 0, 0);
 }
 
